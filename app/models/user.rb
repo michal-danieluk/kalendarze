@@ -5,7 +5,6 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
   belongs_to :supervisor, class_name: 'User', optional: true
   has_many :subordinates, class_name: 'User', foreign_key: 'supervisor_id'
-  has_many :orders
   has_many :confirmed_orders, class_name: 'Order', foreign_key: 'confirmed_by_id'
   
   validates :email, presence: true, uniqueness: true

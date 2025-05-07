@@ -1,36 +1,122 @@
-<h1 class="text-2xl font-bold mb-6">Szczegóły kalendarza</h1>
-
-<div class="bg-white rounded-lg shadow overflow-hidden">
-  <div class="p-6">
-    <dl>
-      <div class="grid grid-cols-2 gap-4 py-2">
-        <dt class="text-gray-600 font-medium">Nazwa:</dt>
-        <dd><%= @calendar.name %></dd>
-      </div>
-      <div class="grid grid-cols-2 gap-4 py-2 border-t">
-        <dt class="text-gray-600 font-medium">Rok:</dt>
-        <dd><%= @calendar.year %></dd>
-      </div>
-      <div class="grid grid-cols-2 gap-4 py-2 border-t">
-        <dt class="text-gray-600 font-medium">Typ:</dt>
-        <dd><%= @calendar.calendar_type %></dd>
-      </div>
-      <div class="grid grid-cols-2 gap-4 py-2 border-t">
-        <dt class="text-gray-600 font-medium">Cena:</dt>
-        <dd><%= number_to_currency(@calendar.price, unit: "PLN", format: "%n %u") %></dd>
-      </div>
-      <% if @calendar.description.present? %>
-        <div class="grid grid-cols-2 gap-4 py-2 border-t">
-          <dt class="text-gray-600 font-medium">Opis:</dt>
-          <dd><%= @calendar.description %></dd>
-        </div>
-      <% end %>
-    </dl>
+<div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6 mb-6">
+  <div class="mb-4">
+    <%= link_to admin_calendars_path, class: "text-indigo-800 hover:text-indigo-600 flex items-center font-medium" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Powrót do listy kalendarzy
+    <% end %>
   </div>
-</div>
 
-<div class="mt-6 flex space-x-4">
-  <%= link_to "Edytuj", edit_admin_calendar_path(@calendar), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
-  <%= button_to "Usuń", admin_calendar_path(@calendar), method: :delete, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded", data: { turbo_confirm: "Czy na pewno chcesz usunąć ten kalendarz?" } %>
-  <%= link_to "Powrót do listy", admin_calendars_path, class: "text-blue-500 hover:text-blue-700" %>
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-indigo-900">Szczegóły kalendarza</h1>
+    <div class="flex space-x-3">
+      <%= link_to edit_admin_calendar_path(@calendar), class: "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-2 px-4 rounded-lg shadow flex items-center" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Edytuj
+      <% end %>
+      
+      <%= button_to admin_calendar_path(@calendar), method: :delete, class: "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-2 px-4 rounded-lg shadow flex items-center", data: { turbo_confirm: "Czy na pewno chcesz usunąć ten kalendarz?\n\nUwaga: Nie można usunąć kalendarza, który jest powiązany z zamówieniami." } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        Usuń
+      <% end %>
+    </div>
+  </div>
+
+  <div class="bg-gray-50 rounded-xl overflow-hidden border border-gray-200">
+    <div class="grid grid-cols-1 md:grid-cols-2">
+      <div class="p-6 border-b md:border-b-0 md:border-r border-gray-200">
+        <h2 class="text-lg font-semibold text-indigo-900 mb-4">Informacje podstawowe</h2>
+        <dl class="space-y-4">
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Nazwa</dt>
+            <dd class="mt-1 text-gray-900 font-medium"><%= @calendar.name %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Rok</dt>
+            <dd class="mt-1 text-gray-900"><%= @calendar.year %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Typ kalendarza</dt>
+            <dd class="mt-1 text-gray-900"><%= @calendar.calendar_type %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Cena</dt>
+            <dd class="mt-1 text-gray-900 font-bold text-indigo-700"><%= number_to_currency(@calendar.price, unit: "PLN", format: "%n %u") %></dd>
+          </div>
+        </dl>
+      </div>
+      
+      <div class="p-6">
+        <h2 class="text-lg font-semibold text-indigo-900 mb-4">Opis produktu</h2>
+        <% if @calendar.description.present? %>
+          <p class="text-gray-700 whitespace-pre-line"><%= @calendar.description %></p>
+        <% else %>
+          <p class="text-gray-500 italic">Brak opisu dla tego kalendarza.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <% if @calendar.order_items.any? %>
+    <div class="mt-8">
+      <h2 class="text-lg font-semibold text-indigo-900 mb-4">Zamówienia zawierające ten kalendarz</h2>
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead>
+            <tr class="bg-gray-50">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID zamówienia</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data zamówienia</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ilość</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Akcje</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <% @calendar.order_items.includes(:order).order("orders.created_at DESC").each do |item| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= item.order.id %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= item.order.created_at.strftime("%d-%m-%Y %H:%M") %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <% case item.order.status %>
+                  <% when "pending" %>
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Oczekujące</span>
+                  <% when "confirmed" %>
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Zatwierdzone</span>
+                  <% when "rejected" %>
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Odrzucone</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= item.quantity %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                  <%= link_to admin_order_path(item.order), class: "text-indigo-600 hover:text-indigo-900" do %>
+                    Zobacz zamówienie
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="mt-8 bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-blue-700">
+            Ten kalendarz nie został jeszcze użyty w żadnym zamówieniu.
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

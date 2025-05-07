@@ -1,24 +1,28 @@
 class Order < ApplicationRecord
-  belongs_to :user, optional: true
   belongs_to :confirmed_by, class_name: 'User', optional: true
   
   has_many :order_items, dependent: :destroy
   has_many :calendars, through: :order_items
   
   validates :status, presence: true, inclusion: { in: %w[pending confirmed rejected] }
-  validates :delivery_address, presence: true
   
-  # Validate anonymous order fields if user is not present
-  validates :customer_email, presence: true, if: -> { user_id.blank? }
-  validates :mpk_number, presence: true, if: -> { user_id.blank? }
-  validates :manager_email, presence: true, if: -> { user_id.blank? }
+  # Validate required fields for all orders
+  validates :customer_email, presence: true
+  validates :mpk_number, presence: true
+  validates :manager_email, presence: true
+  
+  # Validate address fields
+  validates :street, presence: true
+  validates :house_number, presence: true
+  validates :postal_code, presence: true
+  validates :city, presence: true
+  validates :phone_number, presence: true
   
   accepts_nested_attributes_for :order_items, reject_if: proc { |attributes| attributes['quantity'].to_i <= 0 }
   
   scope :pending, -> { where(status: 'pending') }
   scope :confirmed, -> { where(status: 'confirmed') }
   scope :rejected, -> { where(status: 'rejected') }
-  scope :anonymous, -> { where(user_id: nil) }
   
   def confirm(supervisor)
     update(status: 'confirmed', confirmed_by: supervisor, confirmed_at: Time.current)

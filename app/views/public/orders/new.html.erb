@@ -43,10 +43,37 @@
     <div class="mb-6">
       <h2 class="text-xl font-semibold mb-4">Adres dostawy</h2>
       <div class="bg-gray-50 p-4 rounded-lg border">
-        <div class="mb-4">
-          <%= form.label :delivery_address, "Miejsce dostawy (budynek, pokój, itp.)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= form.text_field :delivery_address, class: "border border-gray-300 p-3 rounded-lg w-full", placeholder: "Np. Budynek A, pietro 2, pokój 215" %>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <%= form.label :street, "Ulica", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :street, class: "border border-gray-300 p-3 rounded-lg w-full", placeholder: "Np. Kwiatowa" %>
+          </div>
+          <div>
+            <%= form.label :house_number, "Numer domu/mieszkania", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :house_number, class: "border border-gray-300 p-3 rounded-lg w-full", placeholder: "Np. 12/4" %>
+          </div>
         </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <%= form.label :postal_code, "Kod pocztowy", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :postal_code, class: "border border-gray-300 p-3 rounded-lg w-full", placeholder: "Np. 00-001" %>
+          </div>
+          <div>
+            <%= form.label :city, "Miasto", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :city, class: "border border-gray-300 p-3 rounded-lg w-full", placeholder: "Np. Warszawa" %>
+          </div>
+        </div>
+        <div class="mb-4">
+          <%= form.label :phone_number, "Numer telefonu do kuriera", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.telephone_field :phone_number, class: "border border-gray-300 p-3 rounded-lg w-full", placeholder: "Np. 123-456-789" %>
+        </div>
+        <div class="mb-4">
+          <%= form.label :delivery_notes, "Uwagi do dostawy", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_area :delivery_notes, class: "border border-gray-300 p-3 rounded-lg w-full", rows: 3, placeholder: "Np. Budynek A, pietro 2, pokój 215" %>
+        </div>
+        
+        <!-- Hidden field for backward compatibility -->
+        <%= form.hidden_field :delivery_address, value: "Wprowadzono nowy format adresu" %>
       </div>
     </div>
     
@@ -65,8 +92,8 @@
             </div>
 
             <div class="mt-4">
-              <%= form.fields_for :order_items, @order.order_items.build do |item_form| %>
-                <%= item_form.hidden_field :calendar_id, value: calendar.id %>
+              <%= form.fields_for :order_items, OrderItem.new(calendar_id: calendar.id) do |item_form| %>
+                <%= item_form.hidden_field :calendar_id %>
                 <div class="flex items-center">
                   <label class="mr-4">Ilość:</label>
                   <%= item_form.number_field :quantity, value: 0, min: 0, class: "border rounded p-2 w-20" %>

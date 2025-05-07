@@ -1,8 +1,16 @@
 class Public::OrdersController < ApplicationController
   skip_before_action :authenticate_user!
+  before_action :redirect_if_logged_in
+  
+  def redirect_if_logged_in
+    if user_signed_in?
+      redirect_to root_path, notice: 'Zalogowani użytkownicy nie mogą składać zamówień. Wyloguj się, aby złożyć zamówienie.'
+    end
+  end
   
   def new
     @order = Order.new
+    # Nie tworzymy tutaj order_items, będą one tworzone w widoku
     @calendars = Calendar.all.order(:name)
   end
 
@@ -10,16 +18,8 @@ class Public::OrdersController < ApplicationController
     @order = Order.new(order_params)
     @order.status = 'pending'
     
-    if params[:order] && params[:order][:order_items_attributes]
-      calendar_params = params[:order][:order_items_attributes]
-      
-      # Handle multiple items from order form
-      calendar_params.each do |_, item_params|
-        if item_params[:calendar_id].present? && item_params[:quantity].present? && item_params[:quantity].to_i > 0
-          @order.order_items.build(calendar_id: item_params[:calendar_id], quantity: item_params[:quantity])
-        end
-      end
-    end
+    # Usuwamy ręczne budowanie order_items, ponieważ są one już zawarte w order_params
+    # dzięki accepts_nested_attributes_for :order_items w modelu Order
     
     if @order.order_items.empty?
       @calendars = Calendar.all.order(:name)
@@ -46,10 +46,16 @@ class Public::OrdersController < ApplicationController
   
   def order_params
     params.require(:order).permit(
-      :delivery_address, 
       :customer_email, 
       :mpk_number, 
       :manager_email,
+      :street,
+      :house_number,
+      :postal_code,
+      :city,
+      :phone_number,
+      :delivery_notes,
+      :delivery_address, # Keep for backward compatibility
       order_items_attributes: [:calendar_id, :quantity]
     )
   end

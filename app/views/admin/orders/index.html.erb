@@ -38,20 +38,78 @@
         <%= @orders.count %> <%= @orders.count == 1 ? 'zamówienie' : (@orders.count < 5 ? 'zamówienia' : 'zamówień') %>
       </div>
     </div>
+
+    <!-- Filtry -->
+    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+      <div class="flex items-center mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+        <h3 class="font-semibold text-indigo-900">Filtry</h3>
+      </div>
+      
+      <%= form_with url: admin_orders_path, method: :get, local: true, class: "flex flex-wrap items-end gap-4" do |form| %>
+        <%= hidden_field_tag :status, @status %>
+        <%= hidden_field_tag :sort_by, @sort_by %>
+        <%= hidden_field_tag :sort_direction, @sort_direction %>
+        
+        <div>
+          <%= form.label :mpk, "MPK", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.select :mpk, options_for_select([['Wszystkie', '']].concat(@mpk_values.map{|m| [m, m]}), @mpk_filter), {}, 
+              class: "border border-gray-300 rounded-md shadow-sm p-2 px-3 bg-white" %>
+        </div>
+        
+        <div>
+          <%= form.label :manager, "Manager", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.select :manager, options_for_select([['Wszyscy', '']].concat(@manager_emails.map{|m| [m, m]}), @manager_filter), {}, 
+              class: "border border-gray-300 rounded-md shadow-sm p-2 px-3 bg-white" %>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <%= form.submit "Filtruj", class: "bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md" %>
+          <% if @mpk_filter.present? || @manager_filter.present? %>
+            <%= link_to "Wyczyść", admin_orders_path(status: @status, sort_by: @sort_by, sort_direction: @sort_direction), 
+                class: "bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
     
     <% if @orders.any? %>
       <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-200">
           <thead>
             <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
-              <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">ID</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">Użytkownik</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">Dział</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">
-                <% if @active_tab == "pending" %>
-                  Data złożenia
-                <% else %>
-                  Data <%= @active_tab == "confirmed" ? "zatwierdzenia" : "odrzucenia" %>
+                <%= link_to "ID", admin_orders_path(status: @status, sort_by: 'id', sort_direction: @sort_by == 'id' && @sort_direction == 'asc' ? 'desc' : 'asc', mpk: @mpk_filter, manager: @manager_filter), class: "flex items-center" %>
+                <% if @sort_by == 'id' %>
+                  <span class="ml-1"><%= @sort_direction == 'asc' ? '↑' : '↓' %></span>
+                <% end %>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">
+                <%= link_to "Zamawiający", admin_orders_path(status: @status, sort_by: 'customer_email', sort_direction: @sort_by == 'customer_email' && @sort_direction == 'asc' ? 'desc' : 'asc', mpk: @mpk_filter, manager: @manager_filter), class: "flex items-center" %>
+                <% if @sort_by == 'customer_email' %>
+                  <span class="ml-1"><%= @sort_direction == 'asc' ? '↑' : '↓' %></span>
+                <% end %>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">
+                <%= link_to "MPK", admin_orders_path(status: @status, sort_by: 'mpk_number', sort_direction: @sort_by == 'mpk_number' && @sort_direction == 'asc' ? 'desc' : 'asc', mpk: @mpk_filter, manager: @manager_filter), class: "flex items-center" %>
+                <% if @sort_by == 'mpk_number' %>
+                  <span class="ml-1"><%= @sort_direction == 'asc' ? '↑' : '↓' %></span>
+                <% end %>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">
+                <%= link_to @active_tab == "pending" ? "Data złożenia" : "Data #{@active_tab == 'confirmed' ? 'zatwierdzenia' : 'odrzucenia'}", 
+                    admin_orders_path(status: @status, sort_by: 'created_at', sort_direction: @sort_by == 'created_at' && @sort_direction == 'asc' ? 'desc' : 'asc', mpk: @mpk_filter, manager: @manager_filter), 
+                    class: "flex items-center" %>
+                <% if @sort_by == 'created_at' %>
+                  <span class="ml-1"><%= @sort_direction == 'asc' ? '↑' : '↓' %></span>
+                <% end %>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">
+                <%= link_to "Manager", admin_orders_path(status: @status, sort_by: 'manager_email', sort_direction: @sort_by == 'manager_email' && @sort_direction == 'asc' ? 'desc' : 'asc', mpk: @mpk_filter, manager: @manager_filter), class: "flex items-center" %>
+                <% if @sort_by == 'manager_email' %>
+                  <span class="ml-1"><%= @sort_direction == 'asc' ? '↑' : '↓' %></span>
                 <% end %>
               </th>
               <% if @active_tab != "pending" %>
@@ -69,19 +127,11 @@
               <tr class="hover:bg-indigo-50 transition-colors">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-indigo-900"><%= order.id %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                  <% if order.user.present? %>
-                    <%= order.user.name %>
-                  <% else %>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">Anonimowe</span>
-                    <%= order.customer_email %>
-                  <% end %>
+                  <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">Zamówienie</span>
+                  <%= order.customer_email %>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                  <% if order.user.present? %>
-                    <%= order.user.department %>
-                  <% else %>
-                    <%= order.mpk_number %>
-                  <% end %>
+                  <%= order.mpk_number %>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                   <% if @active_tab == "pending" %>
@@ -89,6 +139,9 @@
                   <% else %>
                     <%= order.confirmed_at&.strftime("%d-%m-%Y %H:%M") || "-" %>
                   <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  <%= order.manager_email %>
                 </td>
                 <% if @active_tab != "pending" %>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center"><%= order.confirmed_by&.name || "-" %></td>

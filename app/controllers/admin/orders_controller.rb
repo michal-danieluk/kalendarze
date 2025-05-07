@@ -6,21 +6,38 @@ class Admin::OrdersController < ApplicationController
   def index
     # Base query depends on user role
     base_orders = if current_user.admin?
-      Order.all.includes(:user, :confirmed_by).order(created_at: :desc)
+      Order.all.includes(:confirmed_by)
     else
-      # For supervisors, include:
-      # 1. Orders from users they supervise
-      # 2. Anonymous orders with their email as manager_email
-      # 3. Regular orders with their email as manager_email
-      Order.left_joins(:user)
-           .where('users.supervisor_id = ? OR orders.manager_email = ?', current_user.id, current_user.email)
+      # For supervisors, include only anonymous orders with their email as manager_email
+      Order.where(manager_email: current_user.email)
            .includes(:confirmed_by)
-           .order(created_at: :desc)
     end
     
     # Filter by status if provided
     @status = params[:status]
-    @orders = @status.present? ? base_orders.where(status: @status) : base_orders
+    filtered_orders = @status.present? ? base_orders.where(status: @status) : base_orders
+    
+    # Filter by MPK if provided
+    @mpk_filter = params[:mpk]
+    filtered_orders = filtered_orders.where(mpk_number: @mpk_filter) if @mpk_filter.present?
+    
+    # Filter by manager email if provided
+    @manager_filter = params[:manager]
+    filtered_orders = filtered_orders.where(manager_email: @manager_filter) if @manager_filter.present?
+    
+    # Apply sorting
+    @sort_by = params[:sort_by] || 'created_at'
+    @sort_direction = params[:sort_direction] || 'desc'
+    
+    # Validate sort_by to prevent SQL injection
+    allowed_sort_fields = ['id', 'created_at', 'status', 'customer_email', 'mpk_number', 'manager_email']
+    @sort_by = 'created_at' unless allowed_sort_fields.include?(@sort_by)
+    
+    # Validate sort_direction
+    @sort_direction = 'desc' unless ['asc', 'desc'].include?(@sort_direction)
+    
+    # Apply ordering
+    @orders = filtered_orders.order(@sort_by => @sort_direction)
     
     # Prepare collections for tabs
     @pending_orders = base_orders.pending
@@ -29,6 +46,10 @@ class Admin::OrdersController < ApplicationController
     
     # Set active tab based on status parameter
     @active_tab = @status || 'pending'
+    
+    # Get unique MPK values and manager emails for filters
+    @mpk_values = Order.distinct.pluck(:mpk_number).compact.sort
+    @manager_emails = Order.distinct.pluck(:manager_email).compact.sort
   end
 
   def show
@@ -69,9 +90,9 @@ class Admin::OrdersController < ApplicationController
   def export
     @status = params[:status]
     @orders = if @status.present?
-      Order.where(status: @status).includes(:user, :confirmed_by, order_items: :calendar)
+      Order.where(status: @status).includes(:confirmed_by, order_items: :calendar)
     else
-      Order.all.includes(:user, :confirmed_by, order_items: :calendar)
+      Order.all.includes(:confirmed_by, order_items: :calendar)
     end
     
     respond_to do |format|
@@ -98,17 +119,16 @@ class Admin::OrdersController < ApplicationController
       # Jeśli wybrano managera, ale jeszcze nie potwierdzono
       @manager = User.find(params[:manager_id])
       
-      # Znajdź oczekujące zamówienia dla podwładnych tego managera
-      @pending_orders = Order.joins(:user)
-                          .where(status: 'pending', users: { supervisor_id: @manager.id })
-                          .includes(:user, order_items: :calendar)
+      # Znajdź oczekujące zamówienia dla tego managera (teraz tylko po emailu)
+      @pending_orders = Order.where(status: 'pending', manager_email: @manager.email)
+                          .includes(order_items: :calendar)
       
       if @pending_orders.any?
         # Pokaż podgląd przed wysłaniem
         render :preview_summary
       else
         # Jeśli nie ma żadnych oczekujących zamówień
-        redirect_to admin_orders_path, alert: "Brak oczekujących zamówień dla pracowników managera #{@manager.name}."
+        redirect_to admin_orders_path, alert: "Brak oczekujących zamówień dla managera #{@manager.name}."
       end
     elsif params[:manager_id].present? && params[:confirm].present?
       # Jeśli potwierdzono wysyłkę
@@ -129,7 +149,7 @@ class Admin::OrdersController < ApplicationController
       # Znajdź wszystkie oczekujące zamówienia dla tego adresu email managera
       # Teraz uwzględniamy zarówno zamówienia anonimowe, jak i zamówienia zalogowanych użytkowników
       @pending_orders = Order.where(status: 'pending', manager_email: @manager_email)
-                        .includes(:user, order_items: :calendar)
+                        .includes(order_items: :calendar)
       
       # Pokaż podgląd przed wysłaniem
       render :preview_by_email
@@ -154,9 +174,8 @@ class Admin::OrdersController < ApplicationController
       manager = User.find_by(id: manager_id)
       
       if manager && valid_token?(token, manager)
-        # Znajdź wszystkie oczekujące zamówienia dla tego managera
-        pending_orders = Order.joins(:user)
-                             .where(status: 'pending', users: { supervisor_id: manager.id })
+        # Znajdź wszystkie oczekujące anonimowe zamówienia dla tego managera po emailu
+        pending_orders = Order.where(status: 'pending', manager_email: manager.email)
         
         # Zatwierdź wszystkie zamówienia
         if pending_orders.any?
@@ -219,9 +238,8 @@ class Admin::OrdersController < ApplicationController
   end
   
   def send_summary_to_manager(manager)
-    # Znajdź oczekujące zamówienia dla podwładnych tego managera
-    pending_orders = Order.joins(:user)
-                        .where(status: 'pending', users: { supervisor_id: manager.id })
+    # Znajdź oczekujące zamówienia dla tego managera (po adresie email)
+    pending_orders = Order.where(status: 'pending', manager_email: manager.email)
                         .includes(order_items: :calendar)
     
     if pending_orders.any?
@@ -237,7 +255,7 @@ class Admin::OrdersController < ApplicationController
     # Znajdź wszystkie oczekujące zamówienia dla tego adresu email managera
     # Zarówno dla zamówień anonimowych jak i zamówień zalogowanych użytkowników
     pending_orders = Order.where(status: 'pending', manager_email: manager_email)
-                        .includes(:user, order_items: :calendar)
+                        .includes(order_items: :calendar)
     
     if pending_orders.any?
       # Wygeneruj token bezpieczeństwa dla adresu email

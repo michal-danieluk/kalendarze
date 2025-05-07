@@ -31,7 +31,6 @@
           <nav class="hidden md:flex space-x-1">
             <%= link_to "Kalendarze", calendars_path, class: "px-3 py-2 rounded-lg hover:bg-indigo-800 hover:text-blue-200 font-medium transition-colors" %>
             <% if user_signed_in? %>
-              <%= link_to "Moje zamówienia", orders_path, class: "px-3 py-2 rounded-lg hover:bg-indigo-800 hover:text-blue-200 font-medium transition-colors" %>
               <% if current_user.admin? %>
                 <%= link_to "Zamówienia", admin_orders_path, class: "px-3 py-2 rounded-lg hover:bg-indigo-800 hover:text-blue-200 font-medium transition-colors" %>
                 <%= link_to "Użytkownicy", admin_users_path, class: "px-3 py-2 rounded-lg hover:bg-indigo-800 hover:text-blue-200 font-medium transition-colors" %>

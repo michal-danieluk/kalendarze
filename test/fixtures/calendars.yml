@@ -4,12 +4,12 @@ one:
   name: MyString
   description: MyText
   year: 1
-  type: 
+  calendar_type: Ścienny
   price: 9.99
 
 two:
   name: MyString
   description: MyText
   year: 1
-  type: 
+  calendar_type: Ścienny
   price: 9.99

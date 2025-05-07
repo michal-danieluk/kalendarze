@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_26_075624) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_07_080030) do
   create_table "calendars", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -42,6 +42,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_26_075624) do
     t.string "customer_email"
     t.string "mpk_number"
     t.string "manager_email"
+    t.string "street"
+    t.string "house_number"
+    t.string "postal_code"
+    t.string "city"
+    t.string "phone_number"
+    t.text "delivery_notes"
     t.index ["confirmed_by_id"], name: "index_orders_on_confirmed_by_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end

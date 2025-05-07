@@ -13,7 +13,16 @@
       <p><strong>Email:</strong> <%= @order.customer_email %></p>
       <p><strong>MPK:</strong> <%= @order.mpk_number %></p>
       <p><strong>Email przełożonego:</strong> <%= @order.manager_email %></p>
-      <p><strong>Adres dostawy:</strong> <%= @order.delivery_address %></p>
+      
+      <div class="mt-4 pt-4 border-t border-gray-200">
+        <h3 class="font-medium mb-2">Adres dostawy:</h3>
+        <p>ul. <%= @order.street %> <%= @order.house_number %></p>
+        <p><%= @order.postal_code %> <%= @order.city %></p>
+        <p><strong>Telefon:</strong> <%= @order.phone_number %></p>
+        <% if @order.delivery_notes.present? %>
+          <p class="mt-2"><strong>Uwagi:</strong> <%= @order.delivery_notes %></p>
+        <% end %>
+      </div>
     </div>
   </div>
 

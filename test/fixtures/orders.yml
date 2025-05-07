@@ -1,13 +1,31 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  user: one
-  status: MyString
+  status: pending
   confirmed_at: 2025-04-09 11:59:24
   confirmed_by: one
+  delivery_address: Test address 1
+  customer_email: customer1@example.com
+  mpk_number: MPK-001
+  manager_email: manager1@example.com
+  street: Test Street
+  house_number: 1/2
+  postal_code: 00-001
+  city: Warsaw
+  phone_number: 123-456-789
+  delivery_notes: Building A, floor 2
 
 two:
-  user: two
-  status: MyString
+  status: confirmed
   confirmed_at: 2025-04-09 11:59:24
   confirmed_by: two
+  delivery_address: Test address 2
+  customer_email: customer2@example.com
+  mpk_number: MPK-002
+  manager_email: manager2@example.com
+  street: Another Street
+  house_number: 42
+  postal_code: 00-002
+  city: Krakow
+  phone_number: 987-654-321
+  delivery_notes: Front desk

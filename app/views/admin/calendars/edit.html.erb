@@ -1,3 +1,14 @@
-<h1 class="text-2xl font-bold mb-6">Edycja kalendarza</h1>
+<div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6 mb-6">
+  <div class="mb-4">
+    <%= link_to admin_calendar_path(@calendar), class: "text-indigo-800 hover:text-indigo-600 flex items-center font-medium" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Powrót do szczegółów
+    <% end %>
+  </div>
 
-<%= render 'form', calendar: @calendar %>
+  <h1 class="text-2xl font-bold mb-6 text-indigo-900">Edycja kalendarza</h1>
+
+  <%= render 'form', calendar: @calendar %>
+</div>

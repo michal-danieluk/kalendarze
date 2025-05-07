@@ -24,11 +24,7 @@
               <td class="py-3 px-4"><%= order.id %></td>
               <td class="py-3 px-4"><%= order.created_at.strftime("%d.%m.%Y %H:%M") %></td>
               <td class="py-3 px-4">
-                <% if order.user %>
-                  <%= order.user.name %> (<%= order.user.email %>)
-                <% else %>
-                  <%= order.customer_email %> (anonimowe)
-                <% end %>
+                <%= order.customer_email %>
               </td>
               <td class="py-3 px-4 text-right"><%= order.total_quantity %> szt.</td>
               <td class="py-3 px-4 text-right">

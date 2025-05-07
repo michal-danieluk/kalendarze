@@ -2,9 +2,8 @@ Rails.application.routes.draw do
   devise_for :users
   
   resources :calendars, only: [:index, :show]
-  resources :orders, only: [:index, :new, :create, :show]
   
-  # Anonymous order routes
+  # Only anonymous order routes - all orders are placed by non-logged-in users
   namespace :public do
     resources :orders, only: [:new, :create, :show]
   end

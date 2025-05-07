@@ -3,7 +3,7 @@ wb = xlsx_package.workbook
 wb.add_worksheet(name: "Zamówienia") do |sheet|
   # Add header row
   sheet.add_row [
-    "ID", "Data zamówienia", "Status", "Zamawiający", "Dział", 
+    "ID", "Data zamówienia", "Status", "Zamawiający", "MPK", 
     "Data potwierdzenia", "Potwierdzone przez", "Kalendarz", 
     "Typ kalendarza", "Ilość", "Cena", "Wartość"
   ]
@@ -21,8 +21,8 @@ wb.add_worksheet(name: "Zamówienia") do |sheet|
         order.id, 
         order.created_at.strftime("%d-%m-%Y %H:%M"),
         status_text,
-        order.user.name,
-        order.user.department,
+        order.customer_email,
+        order.mpk_number,
         order.confirmed_at ? order.confirmed_at.strftime("%d-%m-%Y %H:%M") : "-",
         order.confirmed_by ? order.confirmed_by.name : "-",
         item.calendar.name,

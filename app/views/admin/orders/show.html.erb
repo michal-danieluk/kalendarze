@@ -44,24 +44,28 @@
       <% if @order.confirmed_by.present? %>
         <p><strong><%= @order.status == "confirmed" ? "Zatwierdzone" : "Odrzucone" %> przez:</strong> <%= @order.confirmed_by.name %></p>
       <% end %>
-      <p><strong>Miejsce dostawy:</strong> <%= @order.delivery_address %></p>
+      
+      <div class="mt-4 pt-4 border-t border-gray-200">
+        <h3 class="font-medium mb-2">Adres dostawy:</h3>
+        <% if @order.street.present? && @order.house_number.present? %>
+          <p>ul. <%= @order.street %> <%= @order.house_number %></p>
+          <p><%= @order.postal_code %> <%= @order.city %></p>
+          <p><strong>Telefon:</strong> <%= @order.phone_number %></p>
+          <% if @order.delivery_notes.present? %>
+            <p class="mt-2"><strong>Uwagi:</strong> <%= @order.delivery_notes %></p>
+          <% end %>
+        <% else %>
+          <p><strong>Miejsce dostawy:</strong> <%= @order.delivery_address %></p>
+        <% end %>
+      </div>
     </div>
 
     <div class="bg-gray-50 p-4 rounded">
       <h2 class="font-semibold mb-2">Informacje o zamawiającym</h2>
-      <% if @order.user.present? %>
-        <p><strong>Imię i nazwisko:</strong> <%= @order.user.name %></p>
-        <p><strong>Email:</strong> <%= @order.user.email %></p>
-        <p><strong>Dział:</strong> <%= @order.user.department %></p>
-        <% if @order.user.supervisor.present? %>
-          <p><strong>Przełożony:</strong> <%= @order.user.supervisor.name %></p>
-        <% end %>
-      <% else %>
-        <p class="bg-blue-100 text-blue-800 p-2 rounded mb-2">Zamówienie anonimowe (bez logowania)</p>
-        <p><strong>Email:</strong> <%= @order.customer_email %></p>
-        <p><strong>MPK:</strong> <%= @order.mpk_number %></p>
-        <p><strong>Manager:</strong> <%= @order.manager_email %></p>
-      <% end %>
+      <p class="bg-blue-100 text-blue-800 p-2 rounded mb-2">Zamówienie bez logowania</p>
+      <p><strong>Email:</strong> <%= @order.customer_email %></p>
+      <p><strong>MPK:</strong> <%= @order.mpk_number %></p>
+      <p><strong>Manager:</strong> <%= @order.manager_email %></p>
     </div>
   </div>
 

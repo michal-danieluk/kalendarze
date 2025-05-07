@@ -90,7 +90,7 @@
             <% @orders.each do |order| %>
               <tr>
                 <td><%= order.id %></td>
-                <td><%= order.user ? "#{order.user.name} (#{order.user.email})" : order.customer_email %></td>
+                <td><%= order.customer_email %></td>
                 <td><%= order.created_at.strftime("%d-%m-%Y %H:%M") %></td>
                 <td>
                   <ul>
