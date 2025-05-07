@@ -1,21 +1,78 @@
 <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6">
   <h1 class="text-2xl font-bold mb-6 text-indigo-900">Wyślij zestawienie zamówień do managera</h1>
   
-  <p class="mb-6 text-gray-700">Wprowadź adres email managera, do którego chcesz wysłać zestawienie oczekujących zamówień.</p>
-  
-  <div class="mt-8">
-    <%= form_with url: send_summary_by_email_admin_orders_path, method: :post, class: "space-y-6" do %>
-      <div class="space-y-4">
-        <label class="block text-gray-700 font-medium">Adres email managera:</label>
-        <div class="w-full">
-          <%= email_field_tag :manager_email, nil, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500", placeholder: "email@przyklad.pl", required: true %>
-        </div>
+  <p class="mb-6 text-gray-700">Wybierz managera, do którego chcesz wysłać zestawienie oczekujących zamówień.</p>
+
+  <% if @pending_managers.any? %>
+    <div class="mb-8">
+      <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6">
+        <p class="text-blue-800"><strong>Managerowie z oczekującymi zamówieniami:</strong> <%= @pending_managers.length %></p>
       </div>
       
-      <div class="flex justify-end">
-        <%= link_to "Anuluj", admin_orders_path, class: "bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-lg mr-3" %>
-        <%= submit_tag "Pokaż podgląd", class: "bg-gradient-to-r from-indigo-700 to-blue-900 hover:from-indigo-800 hover:to-blue-950 text-white px-5 py-2 rounded-lg font-medium shadow-lg" %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 divide-y divide-gray-200 rounded-lg">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Manager</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Oczekujące zamówienia</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Akcje</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <% @pending_managers.each do |manager| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% if manager[:name].present? %>
+                    <span class="font-medium text-gray-900"><%= manager[:name] %></span>
+                  <% else %>
+                    <span class="text-orange-600">(brak danych osobowych)</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= manager[:email] %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    <%= manager[:count] %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <form action="<%= send_summary_by_email_admin_orders_path %>" method="post" data-turbo="false">
+                    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                    <input type="hidden" name="manager_email" value="<%= manager[:email] %>">
+                    <button type="submit" class="text-indigo-600 hover:text-indigo-900">Pokaż podgląd</button>
+                  </form>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
-    <% end %>
-  </div>
+    </div>
+    
+    <div class="border-t border-gray-200 pt-6 mt-6">
+      <p class="text-sm text-gray-500 mb-4">Lub wprowadź inny adres email managera:</p>
+  <% else %>
+    <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-6">
+      <p class="text-yellow-800">Brak oczekujących zamówień do zatwierdzenia.</p>
+    </div>
+    
+    <p class="text-gray-700 mb-4">Wprowadź adres email managera:</p>
+  <% end %>
+  
+  <form action="<%= send_summary_by_email_admin_orders_path %>" method="post" class="mt-4" data-turbo="false">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    
+    <div class="flex">
+      <input type="email" name="manager_email" class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="email@przyklad.pl" required>
+      <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-r-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-700">
+        Pokaż podgląd
+      </button>
+    </div>
+    
+    <div class="flex justify-end mt-6">
+      <a href="<%= admin_orders_path %>" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-lg">Powrót</a>
+    </div>
+  </form>
 </div>

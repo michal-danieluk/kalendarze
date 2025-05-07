@@ -1,7 +1,7 @@
 class Admin::OrdersController < ApplicationController
   before_action :authenticate_user!
   before_action :authorize_admin_or_supervisor
-  before_action :set_order, only: [:show, :confirm, :reject]
+  before_action :set_order, only: [:show, :confirm, :reject, :edit_manager, :update_manager]
   
   def index
     # Base query depends on user role
@@ -41,6 +41,7 @@ class Admin::OrdersController < ApplicationController
     
     # Prepare collections for tabs
     @pending_orders = base_orders.pending
+    @sent_for_approval_orders = base_orders.sent_for_approval
     @confirmed_orders = base_orders.confirmed
     @rejected_orders = base_orders.rejected
     
@@ -84,6 +85,28 @@ class Admin::OrdersController < ApplicationController
       end
     else
       redirect_to admin_order_path(@order), alert: 'Nie udało się odrzucić zamówienia.'
+    end
+  end
+  
+  def edit_manager
+    # Only allow admins to edit manager information
+    unless current_user.admin?
+      redirect_to admin_order_path(@order), alert: 'Nie masz uprawnień do edycji danych managera.'
+      return
+    end
+  end
+  
+  def update_manager
+    # Only allow admins to update manager information
+    unless current_user.admin?
+      redirect_to admin_order_path(@order), alert: 'Nie masz uprawnień do edycji danych managera.'
+      return
+    end
+    
+    if @order.update(manager_params)
+      redirect_to admin_order_path(@order), notice: 'Dane managera zostały zaktualizowane.'
+    else
+      render :edit_manager, status: :unprocessable_entity
     end
   end
 
@@ -142,24 +165,48 @@ class Admin::OrdersController < ApplicationController
   end
   
   def send_summary_by_email
-    if params[:manager_email].present? && params[:confirm].blank?
-      # Pobierz email managera z formularza
-      @manager_email = params[:manager_email]
-      
-      # Znajdź wszystkie oczekujące zamówienia dla tego adresu email managera
-      # Teraz uwzględniamy zarówno zamówienia anonimowe, jak i zamówienia zalogowanych użytkowników
-      @pending_orders = Order.where(status: 'pending', manager_email: @manager_email)
-                        .includes(order_items: :calendar)
-      
-      # Pokaż podgląd przed wysłaniem
-      render :preview_by_email
-    elsif params[:manager_email].present? && params[:confirm].present?
-      # Jeśli potwierdzono wysyłkę
-      manager_email = params[:manager_email]
-      send_summary_by_email_to_manager(manager_email)
-      redirect_to admin_orders_path, notice: "Zestawienie zamówień zostało wysłane na adres #{manager_email}."
+    if request.post?
+      if params[:manager_email].present? && params[:confirm].present?
+        # If confirmed sending via POST
+        manager_email = params[:manager_email]
+        send_summary_by_email_to_manager(manager_email)
+        redirect_to admin_orders_path, notice: "Zestawienie zamówień zostało wysłane na adres #{manager_email}."
+      elsif params[:manager_email].present?
+        # Show preview before sending (POST with email parameter but without confirm)
+        @manager_email = params[:manager_email]
+        
+        # Find all pending orders for this manager email
+        @pending_orders = Order.where(status: 'pending', manager_email: @manager_email)
+                          .includes(order_items: :calendar)
+        
+        # Always render the preview page, even if there are no orders
+        # The view will handle the empty state appropriately
+        render :preview_by_email
+      else
+        redirect_to send_summary_by_email_admin_orders_path, alert: "Musisz podać adres email managera."
+      end
     else
-      # Przygotuj formularz do wprowadzenia adresu email managera
+      # Initial GET request - prepare the manager selection page
+      
+      # Get all pending orders
+      pending_orders = Order.where(status: 'pending')
+      
+      # Group pending orders by manager email and count them
+      manager_counts = pending_orders.group(:manager_email).count
+      
+      # Create a collection of pending managers with their order counts and name info
+      @pending_managers = manager_counts.map do |email, count|
+        next if email.blank?
+        
+        # Find the first order with this manager email to get name data
+        order = pending_orders.find_by(manager_email: email)
+        {
+          email: email,
+          name: order&.manager_name,
+          count: count
+        }
+      end.compact.sort_by { |m| [-m[:count], m[:email]] } # Sort by count (desc) then email (asc)
+      
       render :select_manager_by_email
     end
   end
@@ -237,6 +284,10 @@ class Admin::OrdersController < ApplicationController
     end
   end
   
+  def manager_params
+    params.require(:order).permit(:manager_first_name, :manager_last_name)
+  end
+  
   def send_summary_to_manager(manager)
     # Znajdź oczekujące zamówienia dla tego managera (po adresie email)
     pending_orders = Order.where(status: 'pending', manager_email: manager.email)
@@ -248,6 +299,11 @@ class Admin::OrdersController < ApplicationController
       
       # Wyślij maila z zestawieniem
       OrderMailer.summary_email(manager, pending_orders, token).deliver_now
+      
+      # Zmień status zamówień na "wysłane do akceptacji"
+      pending_orders.each do |order|
+        order.mark_as_sent_for_approval
+      end
     end
   end
   
@@ -263,6 +319,11 @@ class Admin::OrdersController < ApplicationController
       
       # Wyślij maila z zestawieniem
       OrderMailer.email_summary_email(manager_email, pending_orders, token).deliver_now
+      
+      # Zmień status zamówień na "wysłane do akceptacji"
+      pending_orders.each do |order|
+        order.mark_as_sent_for_approval
+      end
     end
   end
   

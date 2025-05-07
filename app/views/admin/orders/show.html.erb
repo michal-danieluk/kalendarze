@@ -8,11 +8,13 @@
     <div class="flex items-center">
       <% case @order.status %>
       <% when "pending" %>
-        <span class="badge badge-warning mr-4 text-sm px-3 py-1">Oczekujące</span>
+        <span class="badge badge-warning mr-4 text-sm px-3 py-1 bg-amber-100 text-amber-800 rounded">Oczekujące</span>
+      <% when "sent_for_approval" %>
+        <span class="badge badge-info mr-4 text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded">Wysłane do akceptacji</span>
       <% when "confirmed" %>
-        <span class="badge badge-success mr-4 text-sm px-3 py-1">Zatwierdzone</span>
+        <span class="badge badge-success mr-4 text-sm px-3 py-1 bg-green-100 text-green-800 rounded">Zatwierdzone</span>
       <% when "rejected" %>
-        <span class="badge badge-danger mr-4 text-sm px-3 py-1">Odrzucone</span>
+        <span class="badge badge-danger mr-4 text-sm px-3 py-1 bg-red-100 text-red-800 rounded">Odrzucone</span>
       <% end %>
       
       <div class="flex space-x-2">
@@ -35,6 +37,8 @@
         <% case @order.status %>
         <% when "pending" %>
           Oczekujące
+        <% when "sent_for_approval" %>
+          Wysłane do akceptacji
         <% when "confirmed" %>
           Zatwierdzone (<%= @order.confirmed_at.strftime("%d-%m-%Y %H:%M") if @order.confirmed_at %>)
         <% when "rejected" %>
@@ -65,7 +69,28 @@
       <p class="bg-blue-100 text-blue-800 p-2 rounded mb-2">Zamówienie bez logowania</p>
       <p><strong>Email:</strong> <%= @order.customer_email %></p>
       <p><strong>MPK:</strong> <%= @order.mpk_number %></p>
-      <p><strong>Manager:</strong> <%= @order.manager_email %></p>
+      <div>
+        <div class="flex items-center justify-between">
+          <p><strong>Manager:</strong> 
+            <% if @order.manager_name.present? %>
+              <%= @order.manager_display_name %>
+            <% else %>
+              <%= @order.manager_email %>
+              <% if current_user.admin? %>
+                <span class="ml-2 text-xs text-orange-600">(brak danych osobowych)</span>
+              <% end %>
+            <% end %>
+          </p>
+          <% if current_user.admin? %>
+            <%= link_to edit_manager_admin_order_path(@order), class: "inline-flex items-center text-xs text-indigo-600 hover:text-indigo-800" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edytuj dane managera
+            <% end %>
+          <% end %>
+        </div>
+      </div>
     </div>
   </div>
 

@@ -6,7 +6,7 @@ Witaj,
 Poniżej znajduje się zestawienie zamówień oczekujących na Twoją akceptację dla adresu <%= @manager_email %>:
 
 <% @orders.each do |order| %>
-* Zamówienie #<%= order.id %> (<%= order.created_at.strftime("%d-%m-%Y %H:%M") %>) - <%= order.user ? "#{order.user.name} (#{order.user.email})" : order.customer_email %>
+* Zamówienie #<%= order.id %> (<%= order.created_at.strftime("%d-%m-%Y %H:%M") %>) - <%= order.customer_email %>
   <% order.order_items.each do |item| %>
   - <%= item.calendar.name %> (x<%= item.quantity %>)
   <% end %>
