@@ -1,0 +1,32 @@
+<div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6">
+  <h1 class="text-2xl font-bold mb-6 text-indigo-900">Wyślij zestawienie zamówień do managera</h1>
+  
+  <p class="mb-6 text-gray-700">Wybierz managera, do którego chcesz wysłać zestawienie oczekujących zamówień.</p>
+  
+  <div class="mt-8">
+    <%= form_with url: send_summary_admin_orders_path, method: :get, class: "space-y-6" do %>
+      <div class="space-y-4">
+        <label class="block text-gray-700 font-medium">Manager:</label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <% @managers.each do |manager| %>
+            <div class="bg-gray-50 hover:bg-white border border-gray-200 rounded-lg p-4 transition-all">
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <%= radio_button_tag :manager_id, manager.id, false, class: "h-5 w-5 text-indigo-600" %>
+                <div class="ml-2">
+                  <p class="font-medium text-gray-800"><%= manager.name %></p>
+                  <p class="text-sm text-gray-500"><%= manager.department %></p>
+                  <p class="text-sm text-gray-500"><%= manager.email %></p>
+                </div>
+              </label>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="flex justify-end">
+        <%= link_to "Anuluj", admin_orders_path, class: "bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-lg mr-3" %>
+        <%= submit_tag "Pokaż podgląd", class: "bg-gradient-to-r from-indigo-700 to-blue-900 hover:from-indigo-800 hover:to-blue-950 text-white px-5 py-2 rounded-lg font-medium shadow-lg" %>
+      </div>
+    <% end %>
+  </div>
+</div>

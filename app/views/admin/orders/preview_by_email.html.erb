@@ -1,0 +1,67 @@
+<div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6">
+  <h1 class="text-2xl font-bold mb-6 text-indigo-900">Podsumowanie zamówień dla <%= @manager_email %></h1>
+  
+  <% if @pending_orders.any? %>
+    <p class="mb-6 text-gray-700">
+      Znaleziono <%= @pending_orders.count %> oczekujących zamówień dla managera o adresie <%= @manager_email %>.
+      Po wysłaniu zestawienia, manager otrzyma email z linkiem do masowego zatwierdzenia wszystkich zamówień.
+    </p>
+    
+    <div class="overflow-x-auto mt-6">
+      <table class="min-w-full bg-white border border-gray-200">
+        <thead>
+          <tr class="bg-gray-100 text-gray-800">
+            <th class="py-3 px-4 text-left">Nr zamówienia</th>
+            <th class="py-3 px-4 text-left">Data złożenia</th>
+            <th class="py-3 px-4 text-left">Zamawiający</th>
+            <th class="py-3 px-4 text-right">Suma</th>
+            <th class="py-3 px-4 text-right">Szczegóły</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @pending_orders.each do |order| %>
+            <tr class="border-t border-gray-200 hover:bg-gray-50">
+              <td class="py-3 px-4"><%= order.id %></td>
+              <td class="py-3 px-4"><%= order.created_at.strftime("%d.%m.%Y %H:%M") %></td>
+              <td class="py-3 px-4">
+                <% if order.user %>
+                  <%= order.user.name %> (<%= order.user.email %>)
+                <% else %>
+                  <%= order.customer_email %> (anonimowe)
+                <% end %>
+              </td>
+              <td class="py-3 px-4 text-right"><%= order.total_quantity %> szt.</td>
+              <td class="py-3 px-4 text-right">
+                <%= link_to "Podgląd", admin_order_path(order), class: "text-indigo-600 hover:text-indigo-800" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    
+    <%= form_with url: send_summary_by_email_admin_orders_path, method: :post, class: "mt-8" do %>
+      <%= hidden_field_tag :manager_email, @manager_email %>
+      <%= hidden_field_tag :confirm, "true" %>
+      
+      <div class="flex justify-end">
+        <%= link_to "Anuluj", admin_orders_path, class: "bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-lg mr-3" %>
+        <%= submit_tag "Wyślij zestawienie", class: "bg-gradient-to-r from-indigo-700 to-blue-900 hover:from-indigo-800 hover:to-blue-950 text-white px-5 py-2 rounded-lg font-medium shadow-lg" %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+      <div class="flex">
+        <div class="ml-3">
+          <p class="text-yellow-700">
+            Brak oczekujących zamówień dla managera o adresie <%= @manager_email %>.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex justify-end">
+      <%= link_to "Powrót", admin_orders_path, class: "bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-lg" %>
+    </div>
+  <% end %>
+</div>

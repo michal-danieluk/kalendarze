@@ -1,0 +1,64 @@
+<div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-indigo-900">Moje zamówienia</h1>
+    <%= link_to new_order_path, class: "bg-gradient-to-r from-indigo-700 to-blue-900 hover:from-indigo-800 hover:to-blue-950 text-white px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+      <span class="font-medium">Złóż nowe zamówienie</span>
+    <% end %>
+  </div>
+
+  <% if @orders.any? %>
+    <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
+            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">Data</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-indigo-900 uppercase tracking-wider">Liczba przedmiotów</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-indigo-900 uppercase tracking-wider">Akcje</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @orders.each do |order| %>
+            <tr class="hover:bg-indigo-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-indigo-900"><%= order.id %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800"><%= order.created_at.strftime("%d-%m-%Y %H:%M") %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <% case order.status %>
+                <% when "pending" %>
+                  <span class="bg-gradient-to-r from-amber-500 to-amber-700 text-white text-xs font-bold rounded-full px-3 py-1 shadow-sm">Oczekujące</span>
+                <% when "confirmed" %>
+                  <span class="bg-gradient-to-r from-green-600 to-green-800 text-white text-xs font-bold rounded-full px-3 py-1 shadow-sm">Zatwierdzone</span>
+                <% when "rejected" %>
+                  <span class="bg-gradient-to-r from-red-600 to-red-800 text-white text-xs font-bold rounded-full px-3 py-1 shadow-sm">Odrzucone</span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800"><%= order.order_items.sum(:quantity) %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <%= link_to order_path(order), class: "bg-gradient-to-r from-blue-800 to-indigo-900 hover:from-blue-900 hover:to-indigo-950 text-white py-1 px-4 rounded-lg shadow transition-colors" do %>
+                  <span>Szczegóły</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-8 rounded-xl border border-indigo-100 text-center shadow-lg">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-indigo-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
+      <p class="text-indigo-900 font-medium text-lg mb-6">Nie masz jeszcze żadnych zamówień.</p>
+      <%= link_to new_order_path, class: "bg-gradient-to-r from-indigo-700 to-blue-900 hover:from-indigo-800 hover:to-blue-950 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all inline-flex items-center" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        <span class="font-medium">Złóż pierwsze zamówienie</span>
+      <% end %>
+    </div>
+  <% end %>
+</div>

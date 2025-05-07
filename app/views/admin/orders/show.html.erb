@@ -1,0 +1,99 @@
+<div class="bg-white shadow rounded-lg p-6">
+  <div class="mb-4">
+    <%= link_to "&larr; Powrót do panelu".html_safe, admin_orders_path, class: "text-blue-600 hover:underline" %>
+  </div>
+
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Zamówienie #<%= @order.id %></h1>
+    <div class="flex items-center">
+      <% case @order.status %>
+      <% when "pending" %>
+        <span class="badge badge-warning mr-4 text-sm px-3 py-1">Oczekujące</span>
+      <% when "confirmed" %>
+        <span class="badge badge-success mr-4 text-sm px-3 py-1">Zatwierdzone</span>
+      <% when "rejected" %>
+        <span class="badge badge-danger mr-4 text-sm px-3 py-1">Odrzucone</span>
+      <% end %>
+      
+      <div class="flex space-x-2">
+        <% unless @order.status == "confirmed" %>
+          <%= button_to "Zatwierdź", confirm_admin_order_path(@order), method: :patch, class: "btn-success py-1 px-4 text-sm" %>
+        <% end %>
+        
+        <% unless @order.status == "rejected" %>
+          <%= button_to "Odrzuć", reject_admin_order_path(@order), method: :patch, class: "btn-danger py-1 px-4 text-sm" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-gray-50 p-4 rounded">
+      <h2 class="font-semibold mb-2">Informacje o zamówieniu</h2>
+      <p><strong>Data złożenia:</strong> <%= @order.created_at.strftime("%d-%m-%Y %H:%M") %></p>
+      <p><strong>Status:</strong> 
+        <% case @order.status %>
+        <% when "pending" %>
+          Oczekujące
+        <% when "confirmed" %>
+          Zatwierdzone (<%= @order.confirmed_at.strftime("%d-%m-%Y %H:%M") if @order.confirmed_at %>)
+        <% when "rejected" %>
+          Odrzucone (<%= @order.confirmed_at.strftime("%d-%m-%Y %H:%M") if @order.confirmed_at %>)
+        <% end %>
+      </p>
+      <% if @order.confirmed_by.present? %>
+        <p><strong><%= @order.status == "confirmed" ? "Zatwierdzone" : "Odrzucone" %> przez:</strong> <%= @order.confirmed_by.name %></p>
+      <% end %>
+      <p><strong>Miejsce dostawy:</strong> <%= @order.delivery_address %></p>
+    </div>
+
+    <div class="bg-gray-50 p-4 rounded">
+      <h2 class="font-semibold mb-2">Informacje o zamawiającym</h2>
+      <% if @order.user.present? %>
+        <p><strong>Imię i nazwisko:</strong> <%= @order.user.name %></p>
+        <p><strong>Email:</strong> <%= @order.user.email %></p>
+        <p><strong>Dział:</strong> <%= @order.user.department %></p>
+        <% if @order.user.supervisor.present? %>
+          <p><strong>Przełożony:</strong> <%= @order.user.supervisor.name %></p>
+        <% end %>
+      <% else %>
+        <p class="bg-blue-100 text-blue-800 p-2 rounded mb-2">Zamówienie anonimowe (bez logowania)</p>
+        <p><strong>Email:</strong> <%= @order.customer_email %></p>
+        <p><strong>MPK:</strong> <%= @order.mpk_number %></p>
+        <p><strong>Manager:</strong> <%= @order.manager_email %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <h2 class="text-xl font-semibold mb-4">Zamówione kalendarze</h2>
+  <div class="overflow-x-auto mb-6">
+    <table class="min-w-full bg-white">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="text-left py-3 px-4 font-semibold">Kalendarz</th>
+          <th class="text-left py-3 px-4 font-semibold">Typ</th>
+          <th class="text-left py-3 px-4 font-semibold">Rok</th>
+          <th class="text-center py-3 px-4 font-semibold">Ilość</th>
+          <th class="text-right py-3 px-4 font-semibold">Cena</th>
+          <th class="text-right py-3 px-4 font-semibold">Wartość</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% @order.order_items.includes(:calendar).each do |item| %>
+          <tr class="hover:bg-gray-50">
+            <td class="py-3 px-4"><%= item.calendar.name %></td>
+            <td class="py-3 px-4"><%= item.calendar.calendar_type %></td>
+            <td class="py-3 px-4"><%= item.calendar.year %></td>
+            <td class="py-3 px-4 text-center"><%= item.quantity %></td>
+            <td class="py-3 px-4 text-right"><%= number_to_currency(item.calendar.price, unit: "PLN", format: "%n %u") %></td>
+            <td class="py-3 px-4 text-right"><%= number_to_currency(item.subtotal, unit: "PLN", format: "%n %u") %></td>
+          </tr>
+        <% end %>
+        <tr class="bg-gray-50 font-bold">
+          <td colspan="5" class="py-3 px-4 text-right">Suma:</td>
+          <td class="py-3 px-4 text-right"><%= number_to_currency(@order.total_price, unit: "PLN", format: "%n %u") %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

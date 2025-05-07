@@ -1,0 +1,58 @@
+<div class="bg-white shadow rounded-lg p-6">
+  <div class="mb-4">
+    <%= link_to "&larr; Powrót do kalendarzy".html_safe, calendars_path, class: "text-blue-600 hover:underline" %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div>
+      <div class="bg-gray-100 rounded-lg p-20 flex items-center justify-center">
+        <div class="text-gray-500 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p>Podgląd kalendarza</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h1 class="text-3xl font-bold mb-4"><%= @calendar.name %></h1>
+      <p class="text-gray-600 mb-2">
+        <span class="font-semibold">Typ:</span> <%= @calendar.calendar_type %>
+      </p>
+      <p class="text-gray-600 mb-2">
+        <span class="font-semibold">Rok:</span> <%= @calendar.year %>
+      </p>
+      <p class="text-gray-700 mb-6">
+        <%= @calendar.description %>
+      </p>
+
+      <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <p class="text-2xl font-bold text-blue-600"><%= number_to_currency(@calendar.price, unit: "PLN", format: "%n %u") %></p>
+      </div>
+
+      <% if user_signed_in? %>
+        <%= form_with(url: orders_path, method: :post, class: "mt-4") do |f| %>
+          <%= f.hidden_field "order[order_items_attributes][][calendar_id]", value: @calendar.id %>
+          
+          <div class="bg-gray-50 p-4 rounded-lg border mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Miejsce dostawy (budynek, pokój, itp.)</label>
+            <%= f.text_field "order[delivery_address]", class: "border border-gray-300 p-3 rounded-lg w-full", placeholder: "Np. Budynek A, pietro 2, pokój 215", required: true %>
+            <p class="text-xs text-gray-500 mt-1">To pole jest wymagane.</p>
+          </div>
+          
+          <div class="flex items-center mb-4">
+            <label class="mr-3 font-medium">Ilość:</label>
+            <%= f.number_field "order[order_items_attributes][][quantity]", value: 1, min: 1, class: "border rounded p-2 w-20" %>
+          </div>
+          
+          <%= f.submit "Dodaj do zamówienia", class: "bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded-lg font-medium" %>
+        <% end %>
+      <% else %>
+        <div class="bg-blue-50 p-4 rounded-lg">
+          <p>Aby złożyć zamówienie, musisz się <%= link_to "zalogować", new_user_session_path, class: "text-blue-600 hover:underline" %>.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

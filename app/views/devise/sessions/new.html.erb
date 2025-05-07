@@ -1,0 +1,38 @@
+<div class="max-w-md mx-auto bg-white shadow-lg rounded-xl border border-gray-200 p-8 mt-12">
+  <div class="text-center mb-8">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-indigo-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+    <h2 class="text-2xl font-bold text-indigo-900">System zamawiania kalendarzy</h2>
+    <p class="text-gray-600 mt-1">Zaloguj się do swojego konta</p>
+  </div>
+
+  <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-6" }) do |f| %>
+    <div class="space-y-1">
+      <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+    </div>
+
+    <div class="space-y-1">
+      <%= f.label :password, "Hasło", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.password_field :password, autocomplete: "current-password", class: "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+    </div>
+
+    <% if devise_mapping.rememberable? %>
+      <div class="flex items-center">
+        <%= f.check_box :remember_me, class: "h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" %>
+        <%= f.label :remember_me, "Zapamiętaj mnie", class: "ml-2 block text-sm text-gray-700" %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.submit "Zaloguj się", class: "w-full py-3 px-4 bg-gradient-to-r from-indigo-700 to-blue-900 hover:from-indigo-800 hover:to-blue-950 text-white font-bold rounded-lg shadow-lg focus:outline-none transition-all hover:shadow-xl" %>
+    </div>
+  <% end %>
+
+  <% if devise_mapping.recoverable? %>
+    <div class="mt-6 text-center">
+      <%= link_to "Zapomniałeś hasła?", new_password_path(resource_name), class: "text-indigo-600 hover:text-indigo-800 text-sm font-medium" %>
+    </div>
+  <% end %>
+</div>

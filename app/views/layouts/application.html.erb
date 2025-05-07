@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>System zamawiania kalendarzy</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-gray-50 flex flex-col">
+    <header class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white py-4 shadow-lg">
+      <div class="container mx-auto flex justify-between items-center px-4">
+        <%= link_to root_path, class: "flex items-center space-x-2 text-xl font-bold hover:text-blue-200" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-7 h-7">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>System zamawiania kalendarzy</span>
+        <% end %>
+        
+        <div class="flex items-center space-x-4">
+          <nav class="hidden md:flex space-x-1">
+            <%= link_to "Kalendarze", calendars_path, class: "px-3 py-2 rounded-lg hover:bg-indigo-800 hover:text-blue-200 font-medium transition-colors" %>
+            <% if user_signed_in? %>
+              <%= link_to "Moje zamówienia", orders_path, class: "px-3 py-2 rounded-lg hover:bg-indigo-800 hover:text-blue-200 font-medium transition-colors" %>
+              <% if current_user.admin? %>
+                <%= link_to "Zamówienia", admin_orders_path, class: "px-3 py-2 rounded-lg hover:bg-indigo-800 hover:text-blue-200 font-medium transition-colors" %>
+                <%= link_to "Użytkownicy", admin_users_path, class: "px-3 py-2 rounded-lg hover:bg-indigo-800 hover:text-blue-200 font-medium transition-colors" %>
+              <% elsif current_user.supervisor? %>
+                <%= link_to "Panel zamówień", admin_orders_path, class: "px-3 py-2 rounded-lg hover:bg-indigo-800 hover:text-blue-200 font-medium transition-colors" %>
+              <% end %>
+            <% end %>
+          </nav>
+          
+          <% if user_signed_in? %>
+            <div class="flex items-center space-x-3">
+              <div class="flex items-center bg-indigo-800 bg-opacity-50 rounded-lg px-3 py-1 shadow-inner">
+                <div class="w-8 h-8 rounded-full bg-indigo-700 flex items-center justify-center text-white font-bold shadow mr-2">
+                  <%= current_user.name[0].upcase %>
+                </div>
+                <span class="text-white font-medium mr-2"><%= current_user.name %></span>
+              </div>
+              <%= button_to "Wyloguj", destroy_user_session_path, method: :delete, class: "bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900 px-3 py-1 rounded-lg text-sm font-medium shadow transition-colors" %>
+            </div>
+          <% else %>
+            <div class="flex items-center space-x-3">
+              <%= link_to "Zamów bez logowania", new_public_order_path, class: "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 px-4 py-2 rounded-lg font-medium shadow transition-colors" %>
+              <%= link_to "Zaloguj", new_user_session_path, class: "bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900 px-4 py-2 rounded-lg font-medium shadow transition-colors" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </header>
+
+    <main class="container mx-auto mt-8 p-4">
+      <% if notice %>
+        <div class="alert-success" role="alert">
+          <%= notice %>
+        </div>
+      <% end %>
+      <% if alert %>
+        <div class="alert-danger" role="alert">
+          <%= alert %>
+        </div>
+      <% end %>
+
+      <%= yield %>
+    </main>
+
+    <footer class="bg-gray-100 p-4 mt-8 mt-auto">
+      <div class="container mx-auto text-center text-gray-600">
+        &copy; <%= Time.current.year %> System zamawiania kalendarzy
+      </div>
+    </footer>
+  </body>
+</html>

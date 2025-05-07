@@ -1,0 +1,25 @@
+Zestawienie zamówień
+====================
+
+Witaj <%= @manager.name %>,
+
+Poniżej znajduje się zestawienie zamówień oczekujących na Twoją akceptację:
+
+<% @orders.each do |order| %>
+Zamówienie #<%= order.id %> - <%= order.user.name %> (<%= order.created_at.strftime("%d-%m-%Y %H:%M") %>)
+<% order.order_items.each do |item| %>
+- <%= item.calendar.name %> (x<%= item.quantity %>)
+<% end %>
+
+<% end %>
+
+Łączna liczba oczekujących zamówień: <%= @orders.count %>
+
+Możesz zatwierdzić wszystkie zamówienia, klikając w poniższy link:
+<%= @url %>
+
+Alternatywnie, możesz zalogować się do panelu administracyjnego i zatwierdzić zamówienia pojedynczo.
+
+--
+Ta wiadomość została wygenerowana automatycznie. Prosimy na nią nie odpowiadać.
+© <%= Time.current.year %> System zamawiania kalendarzy

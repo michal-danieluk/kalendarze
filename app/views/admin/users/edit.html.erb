@@ -1,0 +1,13 @@
+<div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6 max-w-4xl mx-auto">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-indigo-900">Edytuj użytkownika</h1>
+    <%= link_to admin_users_path, class: "text-indigo-600 hover:text-indigo-900 flex items-center" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Powrót do listy
+    <% end %>
+  </div>
+  
+  <%= render "form", user: @user %>
+</div>

@@ -1,0 +1,47 @@
+<div class="max-w-md mx-auto bg-white shadow-lg rounded-xl border border-gray-200 p-8 mt-8 mb-8">
+  <div class="text-center mb-8">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-indigo-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+    </svg>
+    <h2 class="text-2xl font-bold text-indigo-900">Utwórz konto</h2>
+    <p class="text-gray-600 mt-1">Dołącz do systemu zamawiania kalendarzy</p>
+  </div>
+
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-5" }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+    
+    <div class="space-y-1">
+      <%= f.label :name, "Imię i nazwisko", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :name, autofocus: true, class: "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+    </div>
+
+    <div class="space-y-1">
+      <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.email_field :email, autocomplete: "email", class: "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+    </div>
+    
+    <div class="space-y-1">
+      <%= f.label :department, "Dział", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :department, class: "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+    </div>
+
+    <div class="space-y-1">
+      <%= f.label :password, "Hasło", class: "block text-sm font-medium text-gray-700" %>
+      <% if @minimum_password_length %>
+        <span class="text-xs text-gray-500">minimum <%= @minimum_password_length %> znaków</span>
+      <% end %>
+      <%= f.password_field :password, autocomplete: "new-password", class: "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+    </div>
+
+    <div class="space-y-1">
+      <%= f.label :password_confirmation, "Potwierdzenie hasła", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+    </div>
+
+    <div>
+      <%= f.submit "Zarejestruj się", class: "w-full py-3 px-4 bg-gradient-to-r from-indigo-700 to-blue-900 hover:from-indigo-800 hover:to-blue-950 text-white font-bold rounded-lg shadow-lg focus:outline-none transition-all hover:shadow-xl" %>
+    </div>
+  <% end %>
+
+  <%= render "devise/shared/links" %>
+</div>

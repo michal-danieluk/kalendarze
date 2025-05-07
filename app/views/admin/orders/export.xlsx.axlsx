@@ -1,0 +1,39 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: "Zamówienia") do |sheet|
+  # Add header row
+  sheet.add_row [
+    "ID", "Data zamówienia", "Status", "Zamawiający", "Dział", 
+    "Data potwierdzenia", "Potwierdzone przez", "Kalendarz", 
+    "Typ kalendarza", "Ilość", "Cena", "Wartość"
+  ]
+
+  # Add data rows
+  @orders.each do |order|
+    order.order_items.each do |item|
+      status_text = case order.status
+                   when "pending" then "Oczekujące"
+                   when "confirmed" then "Zatwierdzone"
+                   when "rejected" then "Odrzucone"
+                   end
+      
+      sheet.add_row [
+        order.id, 
+        order.created_at.strftime("%d-%m-%Y %H:%M"),
+        status_text,
+        order.user.name,
+        order.user.department,
+        order.confirmed_at ? order.confirmed_at.strftime("%d-%m-%Y %H:%M") : "-",
+        order.confirmed_by ? order.confirmed_by.name : "-",
+        item.calendar.name,
+        item.calendar.calendar_type,
+        item.quantity,
+        item.calendar.price,
+        item.subtotal
+      ]
+    end
+  end
+
+  # Adjust column widths for better readability
+  sheet.column_widths 10, 20, 15, 25, 20, 20, 25, 25, 15, 10, 10, 15
+end

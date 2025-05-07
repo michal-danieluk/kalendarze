@@ -1,0 +1,40 @@
+<div class="bg-gradient-to-r from-blue-800 to-indigo-900 px-6 py-5 flex justify-between items-center rounded-t-xl">
+  <div>
+    <h1 class="text-2xl font-bold text-white">Panel administracyjny</h1>
+    <div class="flex items-center space-x-4 mt-2">
+      <%= link_to "Zamówienia", admin_orders_path, class: "text-white hover:text-blue-200 #{controller_name == 'orders' ? 'font-bold underline' : ''}" %>
+      <%= link_to "Kalendarze", admin_calendars_path, class: "text-white hover:text-blue-200 #{controller_name == 'calendars' ? 'font-bold underline' : ''}" %>
+      <%= link_to "Użytkownicy", admin_users_path, class: "text-white hover:text-blue-200 #{controller_name == 'users' ? 'font-bold underline' : ''}" %>
+    </div>
+  </div>
+  <div class="flex items-center space-x-3">
+    <% if controller_name == 'orders' %>
+      <%= link_to export_admin_orders_path, class: "bg-white hover:bg-gray-50 text-indigo-900 py-2 px-4 rounded-lg flex items-center shadow-md" do %>
+        <span class="font-medium">Strona eksportu</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+      <% end %>
+      <%= link_to export_admin_orders_path(format: :xlsx), class: "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-2 px-4 rounded-lg flex items-center shadow-md" do %>
+        <span class="font-medium">Export Excel</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+      <% end %>
+      <%= link_to send_summary_admin_orders_path, class: "bg-gradient-to-r from-purple-600 to-indigo-800 hover:from-purple-700 hover:to-indigo-900 text-white py-2 px-4 rounded-lg flex items-center shadow-md" do %>
+        <span class="font-medium">Wyślij do managerów</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      <% end %>
+    <% end %>
+    <% if controller_name == 'calendars' %>
+      <%= link_to new_admin_calendar_path, class: "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-2 px-4 rounded-lg flex items-center shadow-md" do %>
+        <span class="font-medium">Dodaj nowy kalendarz</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,72 @@
+<div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6">
+  <div class="mb-4">
+    <%= link_to orders_path, class: "text-indigo-800 hover:text-indigo-600 flex items-center font-medium" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Powrót do zamówień
+    <% end %>
+  </div>
+
+  <h1 class="text-2xl font-bold mb-6 text-indigo-900">Nowe zamówienie</h1>
+
+  <%= form_with(model: @order, local: true) do |form| %>
+    <% if @order.errors.any? %>
+      <div class="bg-red-50 text-red-700 p-4 rounded mb-6">
+        <h2 class="font-bold mb-2">Formularz zawiera błędy:</h2>
+        <ul class="list-disc list-inside">
+          <% @order.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold mb-4">Dane zamówienia</h2>
+      <div class="bg-gray-50 p-4 rounded-lg border">
+        <div class="mb-4">
+          <%= form.label :delivery_address, "Miejsce dostawy (budynek, pokój, itp.)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :delivery_address, class: "border border-gray-300 p-3 rounded-lg w-full", placeholder: "Np. Budynek A, pietro 2, pokój 215" %>
+        </div>
+        <div class="mb-4">
+          <%= form.label :manager_email, "Email przełożonego (opcjonalnie)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.email_field :manager_email, class: "border border-gray-300 p-3 rounded-lg w-full", placeholder: "przykladowy.manager@example.com" %>
+          <p class="text-xs text-gray-500 mt-1">Jeśli nie wskażesz adresu email, podsumowanie zostanie wysłane do Twojego przełożonego.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">Wybierz kalendarze</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <% @calendars.each_with_index do |calendar, index| %>
+          <div class="border rounded-lg p-4 hover:border-blue-400 transition-colors">
+            <div class="flex justify-between">
+              <div>
+                <h3 class="font-semibold"><%= calendar.name %></h3>
+                <p class="text-sm text-gray-600"><%= calendar.calendar_type %> - <%= calendar.year %></p>
+              </div>
+              <p class="font-bold"><%= number_to_currency(calendar.price, unit: "PLN", format: "%n %u") %></p>
+            </div>
+
+            <div class="mt-4">
+              <%= form.fields_for :order_items, @order.order_items.build do |item_form| %>
+                <%= item_form.hidden_field :calendar_id, value: calendar.id %>
+                <div class="flex items-center">
+                  <label class="mr-4">Ilość:</label>
+                  <%= item_form.number_field :quantity, value: 0, min: 0, class: "border rounded p-2 w-20" %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex justify-end">
+      <%= form.submit "Złóż zamówienie", class: "bg-gradient-to-r from-indigo-700 to-blue-900 hover:from-indigo-800 hover:to-blue-950 text-white py-3 px-8 rounded-lg font-bold shadow-lg transition-all hover:shadow-xl transform hover:-translate-y-1" %>
+    </div>
+  <% end %>
+</div>

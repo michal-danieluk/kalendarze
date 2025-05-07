@@ -1,0 +1,21 @@
+<div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6">
+  <h1 class="text-2xl font-bold mb-6 text-indigo-900">Wyślij zestawienie zamówień do managera</h1>
+  
+  <p class="mb-6 text-gray-700">Wprowadź adres email managera, do którego chcesz wysłać zestawienie oczekujących zamówień.</p>
+  
+  <div class="mt-8">
+    <%= form_with url: send_summary_by_email_admin_orders_path, method: :post, class: "space-y-6" do %>
+      <div class="space-y-4">
+        <label class="block text-gray-700 font-medium">Adres email managera:</label>
+        <div class="w-full">
+          <%= email_field_tag :manager_email, nil, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500", placeholder: "email@przyklad.pl", required: true %>
+        </div>
+      </div>
+      
+      <div class="flex justify-end">
+        <%= link_to "Anuluj", admin_orders_path, class: "bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-lg mr-3" %>
+        <%= submit_tag "Pokaż podgląd", class: "bg-gradient-to-r from-indigo-700 to-blue-900 hover:from-indigo-800 hover:to-blue-950 text-white px-5 py-2 rounded-lg font-medium shadow-lg" %>
+      </div>
+    <% end %>
+  </div>
+</div>

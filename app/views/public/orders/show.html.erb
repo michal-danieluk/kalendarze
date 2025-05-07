@@ -1,0 +1,69 @@
+<div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6">
+  <h1 class="text-2xl font-bold mb-6 text-indigo-900">Potwierdzenie zamówienia</h1>
+
+  <div class="mb-8 bg-green-50 p-4 rounded border border-green-200">
+    <p class="text-green-700 font-medium">Twoje zamówienie zostało złożone i oczekuje na zatwierdzenie.</p>
+    <p class="text-green-600 mt-2">Numer zamówienia: <%= @order.id %></p>
+    <p class="text-green-600 mt-1">Data złożenia: <%= @order.created_at.strftime("%d.%m.%Y, %H:%M") %></p>
+  </div>
+
+  <div class="mb-6">
+    <h2 class="text-xl font-semibold mb-2">Dane kontaktowe</h2>
+    <div class="bg-gray-50 p-4 rounded border">
+      <p><strong>Email:</strong> <%= @order.customer_email %></p>
+      <p><strong>MPK:</strong> <%= @order.mpk_number %></p>
+      <p><strong>Email przełożonego:</strong> <%= @order.manager_email %></p>
+      <p><strong>Adres dostawy:</strong> <%= @order.delivery_address %></p>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <h2 class="text-xl font-semibold mb-2">Szczegóły zamówienia</h2>
+    <div class="bg-gray-50 rounded border overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+          <thead class="bg-gray-100 border-b">
+            <tr>
+              <th class="text-left py-3 px-4 font-semibold text-sm text-gray-700">Kalendarz</th>
+              <th class="text-center py-3 px-4 font-semibold text-sm text-gray-700">Ilość</th>
+              <th class="text-right py-3 px-4 font-semibold text-sm text-gray-700">Cena jedn.</th>
+              <th class="text-right py-3 px-4 font-semibold text-sm text-gray-700">Razem</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <% @order.order_items.each do |item| %>
+              <tr>
+                <td class="py-3 px-4">
+                  <div>
+                    <p class="font-medium"><%= item.calendar.name %></p>
+                    <p class="text-sm text-gray-500"><%= item.calendar.calendar_type %> - <%= item.calendar.year %></p>
+                  </div>
+                </td>
+                <td class="py-3 px-4 text-center"><%= item.quantity %></td>
+                <td class="py-3 px-4 text-right"><%= number_to_currency(item.calendar.price, unit: "PLN", format: "%n %u") %></td>
+                <td class="py-3 px-4 text-right font-medium"><%= number_to_currency(item.subtotal, unit: "PLN", format: "%n %u") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot class="bg-gray-50">
+            <tr>
+              <td colspan="3" class="py-3 px-4 text-right font-bold">Suma:</td>
+              <td class="py-3 px-4 text-right font-bold"><%= number_to_currency(@order.total_price, unit: "PLN", format: "%n %u") %></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-10 border-t pt-6">
+    <p class="text-gray-600">
+      Dziękujemy za złożenie zamówienia. Powiadomienie o statusie zamówienia zostanie wysłane na podany adres email.
+    </p>
+    <div class="mt-6">
+      <%= link_to root_path, class: "inline-block bg-gradient-to-r from-indigo-700 to-blue-900 hover:from-indigo-800 hover:to-blue-950 text-white py-2 px-6 rounded-lg shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5" do %>
+        Wróć do strony głównej
+      <% end %>
+    </div>
+  </div>
+</div>

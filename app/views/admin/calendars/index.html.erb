@@ -1,0 +1,37 @@
+<div class="max-w-7xl mx-auto bg-gray-100 shadow-xl rounded-xl overflow-hidden border border-gray-200 mb-8">
+  <%= render 'admin/navigation' %>
+
+  <div class="p-6">
+    <h1 class="text-2xl font-bold mb-6">Zarządzanie kalendarzami</h1>
+
+<div class="overflow-x-auto">
+  <table class="min-w-full bg-white">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="py-2 px-4 text-left">Nazwa</th>
+        <th class="py-2 px-4 text-left">Rok</th>
+        <th class="py-2 px-4 text-left">Typ</th>
+        <th class="py-2 px-4 text-left">Cena</th>
+        <th class="py-2 px-4 text-left">Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @calendars.each do |calendar| %>
+        <tr class="border-b">
+          <td class="py-2 px-4"><%= calendar.name %></td>
+          <td class="py-2 px-4"><%= calendar.year %></td>
+          <td class="py-2 px-4"><%= calendar.calendar_type %></td>
+          <td class="py-2 px-4"><%= number_to_currency(calendar.price, unit: "PLN", format: "%n %u") %></td>
+          <td class="py-2 px-4">
+            <%= link_to "Pokaż", admin_calendar_path(calendar), class: "text-blue-500 hover:text-blue-700" %>
+            <%= link_to "Edytuj", edit_admin_calendar_path(calendar), class: "ml-2 text-green-500 hover:text-green-700" %>
+            <%= button_to "Usuń", admin_calendar_path(calendar), method: :delete, class: "ml-2 text-red-500 hover:text-red-700", form: { data: { turbo_confirm: "Czy na pewno chcesz usunąć ten kalendarz?" } } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+  </div>
+</div>
