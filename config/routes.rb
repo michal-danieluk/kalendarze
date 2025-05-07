@@ -13,6 +13,8 @@ Rails.application.routes.draw do
       member do
         patch :confirm
         patch :reject
+        get :edit_manager
+        patch :update_manager
       end
       collection do
         get :export
