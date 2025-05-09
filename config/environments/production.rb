@@ -82,6 +82,13 @@ Rails.application.configure do
   # Set the host for URL generation in emails and other places
   config.action_mailer.default_url_options = { host: "rails.bieda.it" }
 
+  # Configure Mailgun as the delivery method
+  config.action_mailer.delivery_method = :mailgun
+  config.action_mailer.mailgun_settings = {
+    api_key: Rails.application.credentials.dig(:mailgun, :api_key),
+    domain: Rails.application.credentials.dig(:mailgun, :domain)
+  }
+
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts = [
     "rails.bieda.it"

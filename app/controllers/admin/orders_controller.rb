@@ -362,12 +362,66 @@ class Admin::OrdersController < ApplicationController
     begin
       # Dekodowanie tokenu
       data = JSON.parse(Base64.urlsafe_decode64(token))
-      
+
       # Sprawdzenie czy token należy do właściwego adresu email managera i czy nie wygasł
-      data["manager_email"] == manager_email && 
+      data["manager_email"] == manager_email &&
       data["exp"] > Time.now.to_i
     rescue
       false
+    end
+  end
+
+  def valid_order_token?(token, order_id)
+    begin
+      # Decode the token
+      data = JSON.parse(Base64.urlsafe_decode64(token))
+
+      # Check if token belongs to the correct order and hasn't expired
+      data["order_id"] == order_id.to_i &&
+      data["exp"] > Time.now.to_i
+    rescue
+      false
+    end
+  end
+
+  def manager_approve
+    process_manager_action(:confirm)
+  end
+
+  def manager_reject
+    process_manager_action(:reject)
+  end
+
+  private
+
+  def process_manager_action(action)
+    token = params[:token]
+    order_id = params[:id]
+
+    @order = Order.find_by(id: order_id)
+
+    if @order && valid_order_token?(token, @order.id)
+      # Find manager user or create a temporary confirmation user
+      confirming_user = User.find_by(email: @order.manager_email)
+      confirming_user ||= User.find_by(role: 'admin') # Fallback to admin
+
+      if action == :confirm
+        if @order.confirm(confirming_user)
+          @status = 'confirmed'
+          render 'manager_response', layout: false
+        else
+          redirect_to root_path, alert: "Nie udało się zatwierdzić zamówienia."
+        end
+      elsif action == :reject
+        if @order.reject(confirming_user)
+          @status = 'rejected'
+          render 'manager_response', layout: false
+        else
+          redirect_to root_path, alert: "Nie udało się odrzucić zamówienia."
+        end
+      end
+    else
+      redirect_to root_path, alert: "Nieprawidłowy token lub link wygasł."
     end
   end
 end

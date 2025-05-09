@@ -1,0 +1,37 @@
+PROŚBA O ZATWIERDZENIE ZAMÓWIENIA
+
+Witaj,
+
+Otrzymujesz tę wiadomość, ponieważ pracownik podał Twój adres e-mail jako osobę zatwierdzającą zamówienie kalendarzy.
+
+SZCZEGÓŁY ZAMÓWIENIA #<%= @order.id %>
+-----------------------------------
+Osoba zamawiająca: <%= @order.customer_email %>
+MPK: <%= @order.mpk_number %>
+Data złożenia: <%= @order.created_at.strftime('%d-%m-%Y %H:%M') %>
+
+ZAMÓWIONE PRODUKTY:
+<% @order.order_items.each do |item| %>
+- <%= item.calendar.name %> | Ilość: <%= item.quantity %> | Cena: <%= number_to_currency(item.calendar.price, unit: 'zł', format: '%n %u') %> | Wartość: <%= number_to_currency(item.subtotal, unit: 'zł', format: '%n %u') %>
+<% end %>
+
+Suma: <%= number_to_currency(@order.total_price, unit: 'zł', format: '%n %u') %>
+
+ADRES DOSTAWY:
+<%= @order.street %> <%= @order.house_number %>
+<%= @order.postal_code %> <%= @order.city %>
+Tel: <%= @order.phone_number %>
+
+Proszę o potwierdzenie lub odrzucenie tego zamówienia przy użyciu poniższych linków:
+
+Aby ZATWIERDZIĆ zamówienie, otwórz ten link w przeglądarce:
+<%= @approve_url %>
+
+Aby ODRZUCIĆ zamówienie, otwórz ten link w przeglądarce:
+<%= @reject_url %>
+
+Powyższe linki są ważne przez 24 godziny. Jeśli nie podejmiesz decyzji w tym czasie, konieczne będzie ponowne wysłanie prośby o zatwierdzenie.
+
+---
+Ta wiadomość została wygenerowana automatycznie. Prosimy nie odpowiadać na ten e-mail.
+© <%= Date.today.year %> Kalendarze - Wszystkie prawa zastrzeżone

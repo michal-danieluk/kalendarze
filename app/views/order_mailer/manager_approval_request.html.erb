@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #005f73;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      border-radius: 5px 5px 0 0;
+    }
+    .content {
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+    }
+    .order-details {
+      margin: 20px 0;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 10px 5px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      color: white;
+    }
+    .approve {
+      background-color: #0a9396;
+    }
+    .reject {
+      background-color: #ae2012;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Prośba o zatwierdzenie zamówienia</h1>
+    </div>
+    
+    <div class="content">
+      <p>Witaj,</p>
+      
+      <p>Otrzymujesz tę wiadomość, ponieważ pracownik podał Twój adres e-mail jako osobę zatwierdzającą zamówienie kalendarzy.</p>
+      
+      <div class="order-details">
+        <h2>Szczegóły zamówienia #<%= @order.id %></h2>
+        
+        <p><strong>Osoba zamawiająca:</strong> <%= @order.customer_email %></p>
+        <p><strong>MPK:</strong> <%= @order.mpk_number %></p>
+        <p><strong>Data złożenia:</strong> <%= @order.created_at.strftime('%d-%m-%Y %H:%M') %></p>
+        
+        <h3>Zamówione produkty:</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Produkt</th>
+              <th>Ilość</th>
+              <th>Cena jedn.</th>
+              <th>Wartość</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @order.order_items.each do |item| %>
+              <tr>
+                <td><%= item.calendar.name %></td>
+                <td><%= item.quantity %></td>
+                <td><%= number_to_currency(item.calendar.price, unit: 'zł', format: '%n %u') %></td>
+                <td><%= number_to_currency(item.subtotal, unit: 'zł', format: '%n %u') %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="text-align: right;"><strong>Suma:</strong></td>
+              <td><strong><%= number_to_currency(@order.total_price, unit: 'zł', format: '%n %u') %></strong></td>
+            </tr>
+          </tfoot>
+        </table>
+        
+        <h3>Adres dostawy:</h3>
+        <p>
+          <%= @order.street %> <%= @order.house_number %><br>
+          <%= @order.postal_code %> <%= @order.city %><br>
+          Tel: <%= @order.phone_number %>
+        </p>
+      </div>
+      
+      <p>Proszę o potwierdzenie lub odrzucenie tego zamówienia:</p>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="<%= @approve_url %>" class="button approve">Zatwierdź zamówienie</a>
+        <a href="<%= @reject_url %>" class="button reject">Odrzuć zamówienie</a>
+      </div>
+      
+      <p>Powyższe linki są ważne przez 24 godziny. Jeśli nie podejmiesz decyzji w tym czasie, konieczne będzie ponowne wysłanie prośby o zatwierdzenie.</p>
+    </div>
+    
+    <div class="footer">
+      <p>Ta wiadomość została wygenerowana automatycznie. Prosimy nie odpowiadać na ten e-mail.</p>
+      <p>&copy; <%= Date.today.year %> Kalendarze - Wszystkie prawa zastrzeżone</p>
+    </div>
+  </div>
+</body>
+</html>

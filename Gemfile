@@ -76,3 +76,6 @@ gem "caxlsx", "~> 4.2"
 gem "caxlsx_rails", "~> 0.6.4"
 
 gem "tailwindcss-ruby", "~> 4.1"
+
+# Email delivery with Mailgun
+gem "mailgun-ruby", "~> 1.2"

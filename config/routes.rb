@@ -15,6 +15,8 @@ Rails.application.routes.draw do
         patch :reject
         get :edit_manager
         patch :update_manager
+        get :manager_approve, to: 'orders#manager_approve'
+        get :manager_reject, to: 'orders#manager_reject'
       end
       collection do
         get :export
@@ -25,7 +27,7 @@ Rails.application.routes.draw do
         get :bulk_approve
       end
     end
-    
+
     resources :users
     resources :calendars
   end

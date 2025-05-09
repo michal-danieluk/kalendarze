@@ -45,6 +45,9 @@ Aplikacja internetowa do zbierania zamówień na kalendarze firmowe, która umo�
    http://localhost:3000
    ```
 
+6. (Opcjonalnie) Skonfiguruj Mailgun do wysyłania e-maili:
+   Instrukcje konfiguracji znajdziesz w [dokumentacji Mailgun](doc/MAILGUN_SETUP.md)
+
 ## Domyślni użytkownicy
 
 W trybie development dostępne są następujące konta testowe:
@@ -60,6 +63,7 @@ W trybie development dostępne są następujące konta testowe:
 - Zarządzanie rolami użytkowników (admin, przełożony, pracownik)
 - Składanie zamówień na kalendarze
 - Zatwierdzanie/odrzucanie zamówień przez przełożonych
+- Automatyczne wysyłanie e-maili do managerów w celu zatwierdzenia zamówień
 - Generowanie raportów i eksport do Excela
 - Wyszukiwanie i filtrowanie zamówień
 - Responsywny interfejs użytkownika (Tailwind CSS)
@@ -73,6 +77,7 @@ W trybie development dostępne są następujące konta testowe:
 - PostgreSQL (baza danych)
 - Redis (cache, ActionCable)
 - Axlsx (eksport do Excela)
+- Mailgun (wysyłka e-maili)
 
 ## Licencja
 
