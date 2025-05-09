@@ -27,7 +27,7 @@ class Order < ApplicationRecord
   scope :rejected, -> { where(status: 'rejected') }
 
   # Callbacks
-  after_create :send_manager_approval_email, if: :should_send_manager_email?
+  # Nie używamy automatycznego callbacka, będzie kontrolowany ręcznie
 
   def confirm(supervisor)
     update(status: 'confirmed', confirmed_by: supervisor, confirmed_at: Time.current)
@@ -42,15 +42,13 @@ class Order < ApplicationRecord
   end
 
   def send_manager_approval_email
-    # Send email to manager for approval
+    # Send email to manager for approval, without changing status
     OrderMailer.manager_approval_request(self).deliver_later
-    mark_as_sent_for_approval
   end
 
   def send_manager_approval_email!
-    # Send email immediately (for manual triggers)
+    # Send email immediately (for manual triggers), without changing status
     OrderMailer.manager_approval_request(self).deliver_now
-    mark_as_sent_for_approval
   end
 
   def should_send_manager_email?

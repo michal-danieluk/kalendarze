@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   end
   
   namespace :admin do
-    resources :orders, only: [:index, :show] do
+    resources :orders, only: [:index, :show, :edit, :update, :destroy] do
       member do
         patch :confirm
         patch :reject
@@ -17,6 +17,7 @@ Rails.application.routes.draw do
         patch :update_manager
         get :manager_approve, to: 'orders#manager_approve'
         get :manager_reject, to: 'orders#manager_reject'
+        post :send_approval_email
       end
       collection do
         get :export

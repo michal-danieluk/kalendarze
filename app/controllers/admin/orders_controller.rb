@@ -56,6 +56,39 @@ class Admin::OrdersController < ApplicationController
   def show
   end
 
+  def edit
+    # Sprawdzenie czy użytkownik jest administratorem
+    unless current_user.admin?
+      redirect_to admin_orders_path, alert: 'Tylko administrator może edytować zamówienia.'
+      return
+    end
+  end
+
+  def update
+    # Sprawdzenie czy użytkownik jest administratorem
+    unless current_user.admin?
+      redirect_to admin_orders_path, alert: 'Tylko administrator może edytować zamówienia.'
+      return
+    end
+
+    if @order.update(order_params)
+      redirect_to admin_order_path(@order), notice: 'Zamówienie zostało zaktualizowane.'
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    # Sprawdzenie czy użytkownik jest administratorem
+    unless current_user.admin?
+      redirect_to admin_orders_path, alert: 'Tylko administrator może usuwać zamówienia.'
+      return
+    end
+
+    @order.destroy
+    redirect_to admin_orders_path, notice: 'Zamówienie zostało usunięte.'
+  end
+
   def confirm
     previous_status = @order.status
     
@@ -74,7 +107,7 @@ class Admin::OrdersController < ApplicationController
 
   def reject
     previous_status = @order.status
-    
+
     if @order.reject(current_user)
       if request.referer&.include?('admin/orders/') && !request.referer&.include?('?')
         # If coming from order details page, stay there
@@ -86,6 +119,18 @@ class Admin::OrdersController < ApplicationController
     else
       redirect_to admin_order_path(@order), alert: 'Nie udało się odrzucić zamówienia.'
     end
+  end
+
+  def send_approval_email
+    @order = Order.find(params[:id])
+
+    # Wyślij e-mail z prośbą o zatwierdzenie
+    @order.send_manager_approval_email!
+
+    # Zmień status na "wysłane do zatwierdzenia"
+    @order.mark_as_sent_for_approval
+
+    redirect_to admin_order_path(@order), notice: 'E-mail z prośbą o zatwierdzenie został wysłany do managera.'
   end
   
   def edit_manager
@@ -287,19 +332,36 @@ class Admin::OrdersController < ApplicationController
   def manager_params
     params.require(:order).permit(:manager_first_name, :manager_last_name)
   end
+
+  def order_params
+    params.require(:order).permit(
+      :customer_email,
+      :mpk_number,
+      :manager_email,
+      :manager_first_name,
+      :manager_last_name,
+      :street,
+      :house_number,
+      :postal_code,
+      :city,
+      :phone_number,
+      :delivery_notes,
+      :status
+    )
+  end
   
   def send_summary_to_manager(manager)
     # Znajdź oczekujące zamówienia dla tego managera (po adresie email)
     pending_orders = Order.where(status: 'pending', manager_email: manager.email)
                         .includes(order_items: :calendar)
-    
+
     if pending_orders.any?
       # Wygeneruj token bezpieczeństwa
       token = generate_token(manager)
-      
+
       # Wyślij maila z zestawieniem
       OrderMailer.summary_email(manager, pending_orders, token).deliver_now
-      
+
       # Zmień status zamówień na "wysłane do akceptacji"
       pending_orders.each do |order|
         order.mark_as_sent_for_approval
@@ -312,14 +374,14 @@ class Admin::OrdersController < ApplicationController
     # Zarówno dla zamówień anonimowych jak i zamówień zalogowanych użytkowników
     pending_orders = Order.where(status: 'pending', manager_email: manager_email)
                         .includes(order_items: :calendar)
-    
+
     if pending_orders.any?
       # Wygeneruj token bezpieczeństwa dla adresu email
       token = generate_email_token(manager_email)
-      
+
       # Wyślij maila z zestawieniem
       OrderMailer.email_summary_email(manager_email, pending_orders, token).deliver_now
-      
+
       # Zmień status zamówień na "wysłane do akceptacji"
       pending_orders.each do |order|
         order.mark_as_sent_for_approval

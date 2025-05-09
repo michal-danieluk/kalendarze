@@ -1,0 +1,112 @@
+<div class="bg-white shadow rounded-lg p-6">
+  <div class="mb-4">
+    <%= link_to "&larr; Powrót do zamówienia".html_safe, admin_order_path(@order), class: "text-blue-600 hover:underline" %>
+  </div>
+
+  <h1 class="text-2xl font-bold mb-6">Edycja zamówienia #<%= @order.id %></h1>
+
+  <%= form_with(model: [:admin, @order], html: { class: "space-y-6" }) do |form| %>
+    <% if @order.errors.any? %>
+      <div class="bg-red-50 text-red-600 p-4 rounded mb-6">
+        <h2><%= pluralize(@order.errors.count, "błąd") %> uniemożliwił zapisanie zamówienia:</h2>
+        <ul class="list-disc pl-5 mt-2">
+          <% @order.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="space-y-4">
+        <h2 class="text-lg font-semibold border-b pb-2">Informacje o zamawiającym</h2>
+        
+        <div>
+          <%= form.label :customer_email, "E-mail zamawiającego", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.email_field :customer_email, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        
+        <div>
+          <%= form.label :mpk_number, "Numer MPK", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :mpk_number, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        
+        <div>
+          <%= form.label :status, "Status zamówienia", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :status, 
+              options_for_select([
+                ["Oczekujące", "pending"], 
+                ["Wysłane do akceptacji", "sent_for_approval"], 
+                ["Zatwierdzone", "confirmed"], 
+                ["Odrzucone", "rejected"]
+              ], @order.status),
+              {}, 
+              { class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" } 
+          %>
+        </div>
+      </div>
+      
+      <div class="space-y-4">
+        <h2 class="text-lg font-semibold border-b pb-2">Informacje o managerze</h2>
+        
+        <div>
+          <%= form.label :manager_email, "E-mail managera", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.email_field :manager_email, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        
+        <div>
+          <%= form.label :manager_first_name, "Imię managera", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :manager_first_name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        
+        <div>
+          <%= form.label :manager_last_name, "Nazwisko managera", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :manager_last_name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+      </div>
+    </div>
+    
+    <div class="space-y-4 mt-6">
+      <h2 class="text-lg font-semibold border-b pb-2">Adres dostawy</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <%= form.label :street, "Ulica", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :street, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        
+        <div>
+          <%= form.label :house_number, "Numer domu/lokalu", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :house_number, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        
+        <div>
+          <%= form.label :postal_code, "Kod pocztowy", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :postal_code, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        
+        <div>
+          <%= form.label :city, "Miasto", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :city, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+      </div>
+      
+      <div>
+        <%= form.label :phone_number, "Numer telefonu", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :phone_number, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      </div>
+      
+      <div>
+        <%= form.label :delivery_notes, "Uwagi do dostawy", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_area :delivery_notes, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      </div>
+    </div>
+    
+    <div class="pt-5 border-t border-gray-200">
+      <div class="flex justify-end">
+        <%= link_to "Anuluj", admin_order_path(@order), class: "bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        <%= form.submit "Zapisz zmiany", class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      </div>
+    </div>
+  <% end %>
+</div>

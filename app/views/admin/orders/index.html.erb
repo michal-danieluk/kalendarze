@@ -188,6 +188,14 @@
                     <%= button_to "Zatwierdź", confirm_admin_order_path(order), method: :patch, class: "bg-gradient-to-r from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 text-white py-1 px-4 rounded-lg shadow mr-1 inline-block" %>
                     <%= button_to "Odrzuć", reject_admin_order_path(order), method: :patch, class: "bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white py-1 px-4 rounded-lg shadow inline-block" %>
                   <% end %>
+                  <% if current_user.admin? %>
+                    <%= link_to edit_admin_order_path(order), class: "bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white py-1 px-4 rounded-lg shadow mr-1 inline-block" do %>
+                      <i class="fas fa-pencil-alt"></i> Edytuj
+                    <% end %>
+                    <%= button_to admin_order_path(order), method: :delete, data: { confirm: "Czy na pewno chcesz usunąć to zamówienie? Ta operacja jest nieodwracalna." }, class: "bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white py-1 px-4 rounded-lg shadow inline-block" do %>
+                      <i class="fas fa-trash-alt"></i> Usuń
+                    <% end %>
+                  <% end %>
                 </td>
               </tr>
             <% end %>
