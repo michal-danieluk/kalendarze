@@ -1,0 +1,51 @@
+POTWIERDZENIE ZAMÓWIENIA
+
+Dzień dobry,
+
+Dziękujemy za złożenie zamówienia na kalendarze. Poniżej znajdują się szczegóły Twojego zamówienia.
+
+SZCZEGÓŁY ZAMÓWIENIA #<%= @order.id %>
+-----------------------------------
+Numer zamówienia: <%= @order.id %>
+Data złożenia: <%= @order.created_at.strftime('%d-%m-%Y %H:%M') %>
+Status: 
+<% case @order.status %>
+<% when "pending" %>
+  Oczekujące
+<% when "sent_for_approval" %>
+  Wysłane do akceptacji
+<% when "confirmed" %>
+  Zatwierdzone
+<% when "rejected" %>
+  Odrzucone
+<% end %>
+MPK: <%= @order.mpk_number %>
+Manager zatwierdzający: <%= @order.manager_display_name %>
+
+ZAMÓWIONE PRODUKTY:
+<% @order.order_items.each do |item| %>
+- <%= item.calendar.name %> | Ilość: <%= item.quantity %> | Cena: <%= number_to_currency(item.calendar.price, unit: 'zł', format: '%n %u') %> | Wartość: <%= number_to_currency(item.subtotal, unit: 'zł', format: '%n %u') %>
+<% end %>
+
+Suma: <%= number_to_currency(@order.total_price, unit: 'zł', format: '%n %u') %>
+
+ADRES DOSTAWY:
+<%= @order.street %> <%= @order.house_number %>
+<%= @order.postal_code %> <%= @order.city %>
+Tel: <%= @order.phone_number %>
+
+<% if @order.delivery_notes.present? %>
+Uwagi do dostawy: <%= @order.delivery_notes %>
+<% end %>
+
+Aby sprawdzić status swojego zamówienia, odwiedź stronę:
+<%= @order_url %>
+
+Jeśli masz jakiekolwiek pytania dotyczące Twojego zamówienia, prosimy o kontakt z działem obsługi klienta.
+
+Z poważaniem,
+Zespół Kalendarze
+
+---
+Ta wiadomość została wygenerowana automatycznie. Prosimy nie odpowiadać na ten e-mail.
+© <%= Date.today.year %> Kalendarze - Wszystkie prawa zastrzeżone

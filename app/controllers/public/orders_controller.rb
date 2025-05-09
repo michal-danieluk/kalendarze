@@ -26,8 +26,11 @@ class Public::OrdersController < ApplicationController
       flash.now[:alert] = "Musisz wybrać co najmniej jeden kalendarz."
       render :new, status: :unprocessable_entity
     elsif @order.save
+      # Wyślij e-mail z potwierdzeniem zamówienia
+      OrderMailer.customer_order_confirmation(@order).deliver_later
+
       session[:order_id] = @order.id
-      redirect_to public_order_path(@order), notice: 'Zamówienie zostało złożone i oczekuje na zatwierdzenie.'
+      redirect_to public_order_path(@order), notice: 'Zamówienie zostało złożone i oczekuje na zatwierdzenie. Wysłaliśmy potwierdzenie na Twój adres e-mail.'
     else
       @calendars = Calendar.all.order(:name)
       render :new, status: :unprocessable_entity

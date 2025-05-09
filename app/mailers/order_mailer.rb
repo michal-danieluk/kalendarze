@@ -31,6 +31,16 @@ class OrderMailer < ApplicationMailer
     )
   end
 
+  def customer_order_confirmation(order)
+    @order = order
+    @order_url = public_order_url(@order)
+
+    mail(
+      to: @order.customer_email,
+      subject: "Potwierdzenie złożenia zamówienia ##{@order.id}"
+    )
+  end
+
   private
 
   def generate_order_token(order)

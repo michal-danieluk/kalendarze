@@ -30,11 +30,23 @@ class Order < ApplicationRecord
   # Nie używamy automatycznego callbacka, będzie kontrolowany ręcznie
 
   def confirm(supervisor)
-    update(status: 'confirmed', confirmed_by: supervisor, confirmed_at: Time.current)
+    if update(status: 'confirmed', confirmed_by: supervisor, confirmed_at: Time.current)
+      # Wyślij powiadomienie do klienta o zatwierdzeniu zamówienia
+      OrderMailer.customer_order_confirmation(self).deliver_later
+      true
+    else
+      false
+    end
   end
 
   def reject(supervisor)
-    update(status: 'rejected', confirmed_by: supervisor, confirmed_at: Time.current)
+    if update(status: 'rejected', confirmed_by: supervisor, confirmed_at: Time.current)
+      # Wyślij powiadomienie do klienta o odrzuceniu zamówienia
+      OrderMailer.customer_order_confirmation(self).deliver_later
+      true
+    else
+      false
+    end
   end
 
   def mark_as_sent_for_approval
